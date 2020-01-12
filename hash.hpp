@@ -1,12 +1,5 @@
-//
-//  hash.hpp
-//  go_hash
-//
-//  Created by Paul Bowen-Huggett on 12/01/2020.
-//
-
-#ifndef hash_hpp
-#define hash_hpp
+#ifndef HASH_HPP
+#define HASH_HPP
 
 #include <cstddef>
 #include <cstdint>
@@ -20,8 +13,11 @@ enum class tags : char {
     digest = 'D',
 };
 
-#define STRING_HASH 1
+// There is a choice of two hash functions: one that simply accumulates a string representation of
+// its inputs (good for observing the code's behavior). A second implementation is based on fnv1a.
+// Neither makes an pretence of being a decent message-digest function.
 
+#define STRING_HASH 1
 #ifdef STRING_HASH
 
 class hash {
@@ -54,12 +50,8 @@ private:
     static constexpr uint64_t fnv1a_64_prime = 0x00000100'000001b3U;
     uint64_t state_ = fnv1a_64_init;
 
-    void update (void const * ptr, size_t size) noexcept {
-        for (auto p = reinterpret_cast<uint8_t const *> (ptr), end = p + size; p != end; ++p) {
-            state_ = (state_ ^ static_cast<uint64_t> (*p)) * fnv1a_64_prime;
-        }
-    }
+    void update (void const * ptr, size_t size) noexcept;
 };
 #endif // STRING_HASH
 
-#endif /* hash_hpp */
+#endif // HASH_HPP

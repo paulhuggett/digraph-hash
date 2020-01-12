@@ -1,6 +1,5 @@
-
-#ifndef vertex_h
-#define vertex_h
+#ifndef VERTEX_HPP
+#define VERTEX_HPP
 
 #include <initializer_list>
 #include <string>
@@ -19,4 +18,4 @@ struct vertex {
     std::vector<vertex *> dependents;
 };
 
-#endif /* vertex_h */
+#endif // VERTEX_HPP

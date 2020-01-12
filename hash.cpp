@@ -1,10 +1,3 @@
-//
-//  hash.cpp
-//  go_hash
-//
-//  Created by Paul Bowen-Huggett on 12/01/2020.
-//
-
 #include "hash.hpp"
 
 #include <algorithm>
