@@ -1,4 +1,5 @@
 #include "memhash.hpp"
+#include <optional>
 #include <unordered_map>
 
 

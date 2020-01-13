@@ -1,4 +1,6 @@
+#include <algorithm>
 #include <array>
+#include <cassert>
 #include <iostream>
 #include <optional>
 #include <unordered_map>
@@ -11,7 +13,7 @@ namespace {
 
     using vertex_digest_pair = std::tuple<vertex const *, hash::digest>;
 
-    // Iterator is an STL iterator type which will produce an instance of type pair.
+    // Iterator is an STL iterator type which will produce an instance of type vertex_digest_pair.
     template <typename Iterator>
     void dump (std::ostream & os, Iterator first, Iterator last) {
         char const * separator = "";
@@ -23,7 +25,7 @@ namespace {
         os << '\n';
     }
 
-    // Iterator is an STL iterator type which will produce an instance of type pair.
+    // Iterator is an STL iterator type which will produce an instance of type vertex_digest_pair.
     template <typename Iterator>
     std::vector<vertex_digest_pair> make_hashes (Iterator first, Iterator last) {
         std::vector<vertex_digest_pair> digests;
