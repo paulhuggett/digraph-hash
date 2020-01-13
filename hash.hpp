@@ -15,7 +15,7 @@ class vertex;
 
 // There is a choice of two hash functions: one that simply accumulates a string representation of
 // its inputs (good for observing the code's behavior). A second implementation is based on fnv1a.
-// Neither makes an pretence of being a decent message-digest function.
+// Neither makes any pretence of being a decent message-digest function.
 
 #define STRING_HASH 1
 #ifdef STRING_HASH

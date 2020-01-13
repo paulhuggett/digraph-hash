@@ -32,9 +32,10 @@ void hash::update_digest (digest const & d) {
 #else // STRING_HASH
 
 void hash::update_vertex (vertex const & x) noexcept {
-    auto const tag = tags::function;
+    auto const tag = tags::vertex;
     update (&tag, sizeof (tag));
-    update (x.name.c_str (), x.name.length () + 1U);
+    auto const & name = x.name ();
+    update (name.c_str (), name.length () + 1U);
 }
 void hash::update_backref (size_t backref) noexcept {
     auto const tag = tags::backref;
@@ -42,7 +43,7 @@ void hash::update_backref (size_t backref) noexcept {
     update (&backref, sizeof (backref));
 }
 void hash::update_digest (digest const & d) noexcept {
-    auto const tag = tags::digest;
+    auto const tag = tags::memoized;
     update (&tag, sizeof (tag));
     update (&d, sizeof (d));
 }
