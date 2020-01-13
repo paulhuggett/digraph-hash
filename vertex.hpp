@@ -3,19 +3,25 @@
 
 #include <initializer_list>
 #include <string>
+#include <utility>
 #include <vector>
 
-struct vertex {
-    explicit vertex (char const * name_, std::initializer_list<vertex *> dependents_ = {})
-            : name{name_}
-            , dependents{dependents_} {}
+class vertex {
+public:
+    explicit vertex (std::string name, std::initializer_list<vertex *> adjacent = {})
+            : name_{std::move (name)}
+            , adjacent_{adjacent} {}
 
-    void add_dependents (std::initializer_list<vertex *> d) {
-        dependents.insert (std::end (dependents), d);
+    void add_adjacent (std::initializer_list<vertex *> d) {
+        adjacent_.insert (std::end (adjacent_), d);
     }
 
-    std::string name;
-    std::vector<vertex *> dependents;
+    std::string const & name () const noexcept { return name_; }
+    std::vector<vertex *> adjacent () const noexcept { return adjacent_; }
+
+private:
+    std::string name_;
+    std::vector<vertex *> adjacent_;
 };
 
 #endif // VERTEX_HPP

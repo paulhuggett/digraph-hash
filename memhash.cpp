@@ -37,7 +37,7 @@ namespace {
         h2.update_vertex (*v);
         h->update_vertex (*v);
         bool looped = false;
-        for (auto dependent : v->dependents) {
+        for (auto dependent : v->adjacent ()) {
             if (auto const r = vertex_hash_impl (dependent, table, h, visited)) {
                 h2.update_digest (r.value ());
             } else {
