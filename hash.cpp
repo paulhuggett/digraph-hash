@@ -24,7 +24,7 @@ void hash::update_backref (size_t backref) {
     state_ += add;
 }
 void hash::update_digest (digest const & d) {
-    auto const add = prefix () + static_cast<char> (tags::memoized) + d;
+    auto const add = prefix () /*+ static_cast<char> (tags::digest)*/ + d;
     bytes_ += add.length ();
     state_ += add;
 }
@@ -32,18 +32,18 @@ void hash::update_digest (digest const & d) {
 #else // STRING_HASH
 
 void hash::update_vertex (vertex const & x) noexcept {
-    auto const tag = tags::vertex;
+    static constexpr auto tag = tags::vertex;
     update (&tag, sizeof (tag));
     auto const & name = x.name ();
     update (name.c_str (), name.length () + 1U);
 }
 void hash::update_backref (size_t backref) noexcept {
-    auto const tag = tags::backref;
+    static constexpr auto tag = tags::backref;
     update (&tag, sizeof (tag));
     update (&backref, sizeof (backref));
 }
 void hash::update_digest (digest const & d) noexcept {
-    auto const tag = tags::memoized;
+    static constexpr auto tag = tags::digest;
     update (&tag, sizeof (tag));
     update (&d, sizeof (d));
 }
