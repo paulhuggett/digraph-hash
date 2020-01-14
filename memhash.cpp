@@ -21,18 +21,15 @@ namespace {
         trace (std::forward<Args> (args)...);
     }
 
-    std::tuple<size_t, hash::digest> vertex_hash_impl (vertex const * const v,
-                                                       memoized_hashes * const table,
-                                                       visited * const visited) {
-        static constexpr auto no_loop = std::numeric_limits<size_t>::max ();
-
+    auto vertex_hash_impl (vertex const * const v, memoized_hashes * const table,
+                           visited * const visited) -> std::tuple<bool, hash::digest> {
         {
             // Have we computed the hash for this function already? If so, did it involve a loop?
             // If we have, and there was no loop, we can return the result immediately.
             auto const pos = table->find (v);
             if (pos != table->end ()) {
                 trace ("Returning pre-computed hash for '", v->name (), "'\n");
-                return {no_loop, pos->second};
+                return {false, pos->second};
             }
         }
 
@@ -45,28 +42,27 @@ namespace {
             if (back_ref_pos != visited->end ()) {
                 trace ("Returning back-ref to ", back_ref_pos->second, '\n');
                 h.update_backref (back_ref_pos->second);
-                return {back_ref_pos->second, h.finalize ()};
+                return {true, h.finalize ()};
             }
         }
 
         // Record that we have visited this vertex and give it a numerical identifier. This will
         // be used to form its back-reference if we loop back here in future.
-        size_t const index = visited->size () + 1U;
-        (*visited)[v] = index;
+        (*visited)[v] = visited->size ();
 
         trace ("Computing hash for '", v->name (), "'\n");
         h.update_vertex (*v);
 
         // Enumerate the adjacent vertices.
-        auto loop_index = no_loop;
+        bool looped = false;
         for (auto adj : v->adjacent ()) {
-            auto adj_digest = vertex_hash_impl (adj, table, visited);
-            loop_index = std::min (std::get<size_t> (adj_digest), loop_index);
+            auto const adj_digest = vertex_hash_impl (adj, table, visited);
+            looped = looped || std::get<bool> (adj_digest);
             h.update_digest (std::get<hash::digest> (adj_digest));
         }
 
-        auto const result = std::make_tuple (loop_index, h.finalize ());
-        if (loop_index == no_loop) {
+        auto const result = std::make_tuple (looped, h.finalize ());
+        if (!looped) {
             trace ("Recording result for '", v->name (), "'\n");
             (*table)[v] = std::get<hash::digest> (result);
         }

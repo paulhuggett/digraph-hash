@@ -107,13 +107,14 @@ namespace {
     /// }
     ///
     /// The result hashes shoud be:
+    ///
     /// | Name | |
-    /// | "a" | Va/Vb/R1<br>
-    ///         Vertex "a" -> vertex "b" -> loop back to the first vertex. The slash in
+    /// | "a" | Va/Vb/R0<br>
+    ///         Vertex "a" -> vertex "b" -> loop back to the first (zeroth) vertex. The slash in
     ///         this notation can be thought of a directed edge between the two adjacent vertices.
-    /// | "b" | Vb/Va/R1 |
-    /// | "c" | Vc/Va/Vb/R2 |
-    /// | "d" | Vd/Vc/Va/Vb/R3 |
+    /// | "b" | Vb/Va/R0 |
+    /// | "c" | Vc/Va/Vb/R1 |
+    /// | "d" | Vd/Vc/Va/Vb/R2 |
     void test_looped () {
         std::list<vertex> graph;
         auto & va = graph.emplace_back ("a");
