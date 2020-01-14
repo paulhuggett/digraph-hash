@@ -14,6 +14,7 @@ namespace {
     void trace () {}
     template <typename T, typename... Args>
     void trace (T const & t, Args... args) {
+	(void) t;
         // std::cout << t;
         trace (std::forward<Args> (args)...);
     }

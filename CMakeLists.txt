@@ -19,7 +19,7 @@ set_target_properties (digraph-hash PROPERTIES
 if (MSVC)
     target_compile_options (digraph-hash PRIVATE /W4)
 elseif (CMAKE_COMPILER_IS_GNUCXX)
-    target_compile_options (digraph-hash PRIVATE -Wall -pedantic)
+    target_compile_options (digraph-hash PRIVATE -Wall -Wextra -pedantic)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     target_compile_options (digraph-hash PRIVATE
         -Weverything
