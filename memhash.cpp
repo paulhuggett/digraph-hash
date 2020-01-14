@@ -1,4 +1,6 @@
 #include "memhash.hpp"
+
+#include <algorithm>
 #include <iostream>
 #include <limits>
 #include <optional>
@@ -14,7 +16,7 @@ namespace {
     void trace () {}
     template <typename T, typename... Args>
     void trace (T const & t, Args... args) {
-	(void) t;
+        (void) t;
         // std::cout << t;
         trace (std::forward<Args> (args)...);
     }
