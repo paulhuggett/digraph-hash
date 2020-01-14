@@ -10,6 +10,7 @@
 namespace {
 
     using vertex_digest_pair = std::tuple<vertex const *, hash::digest>;
+    using graph_digests = std::vector<vertex_digest_pair>;
 
     // Iterator is an STL iterator type which will produce an instance of type vertex_digest_pair.
     template <typename Iterator>
@@ -23,21 +24,21 @@ namespace {
         os << '\n';
     }
 
-    /// \tparam Iterator An iterator type which will produce an instance of type vertex_digest_pair.
+    /// \tparam Iterator An iterator type which will produce an instance of type vertex.
     template <typename Iterator>
-    std::tuple<memoized_hashes, std::vector<vertex_digest_pair>> hash_vertices (Iterator first,
-                                                                                Iterator last) {
-        std::vector<vertex_digest_pair> digests;
-
+    std::tuple<memoized_hashes, graph_digests> hash_vertices (Iterator first, Iterator last) {
+        graph_digests digests;
         memoized_hashes table;
+
         std::for_each (first, last, [&digests, &table] (vertex const & v) {
             digests.emplace_back (&v, vertex_hash (&v, &table));
         });
 
         // Sort the result by vertex name. This means that the iteration order won't have any
         // effect on the output.
+        using value_type = graph_digests::value_type;
         std::sort (std::begin (digests), std::end (digests),
-                   [] (vertex_digest_pair const & x, vertex_digest_pair const & y) {
+                   [] (value_type const & x, value_type const & y) {
                        return std::get<0> (x)->name () < std::get<0> (y)->name ();
                    });
         dump (std::cout, std::begin (digests), std::end (digests));
@@ -48,24 +49,30 @@ namespace {
     ///    c -> a;
     ///    c -> b;
     /// }
-    void test1 () {
+    void simple_test () {
         std::list<vertex> graph;
         auto & va = graph.emplace_back ("a");
         auto & vb = graph.emplace_back ("b");
-        // c -> a; c -> b;
-        graph.emplace_back ("c").adjacent ({&va, &vb});
+        auto & vc = graph.emplace_back ("c").adjacent ({&va, &vb}); // c -> a; c -> b;
 
         auto const h1 = hash_vertices (std::begin (graph), std::end (graph));
-        auto const h2 = hash_vertices (std::rbegin (graph), std::rend (graph));
 
         auto const & mh1 = std::get<memoized_hashes> (h1);
         assert (mh1.size () == 3U);
-        auto const & vdp1 = std::get<std::vector<vertex_digest_pair>> (h1);
+        assert (mh1.count (&va) == 1U);
+        assert (mh1.count (&vb) == 1U);
+        assert (mh1.count (&vc) == 1U);
+
+        auto const h2 = hash_vertices (std::rbegin (graph), std::rend (graph));
 
         auto const & mh2 = std::get<memoized_hashes> (h2);
         assert (mh2.size () == 3U);
-        auto const & vdp2 = std::get<std::vector<vertex_digest_pair>> (h2);
+        assert (mh2.count (&va) == 1U);
+        assert (mh2.count (&vb) == 1U);
+        assert (mh2.count (&vc) == 1U);
 
+        auto const & vdp1 = std::get<graph_digests> (h1);
+        auto const & vdp2 = std::get<graph_digests> (h2);
         assert (
             std::equal (std::begin (vdp1), std::end (vdp1), std::begin (vdp2), std::end (vdp2)));
     }
@@ -77,22 +84,17 @@ namespace {
     void tiny_loop () {
         std::list<vertex> graph;
         auto & va = graph.emplace_back ("a");
-        auto & vb = graph.emplace_back ("b");
-
+        auto & vb = graph.emplace_back ("b").adjacent (&va); // b -> a;
         va.adjacent (&vb); // a -> b;
-        vb.adjacent (&va); // b -> a;
 
         auto const h1 = hash_vertices (std::begin (graph), std::end (graph));
+        assert (std::get<memoized_hashes> (h1).size () == 0U);
+
         auto const h2 = hash_vertices (std::rbegin (graph), std::rend (graph));
+        assert (std::get<memoized_hashes> (h2).size () == 0U);
 
-        auto const & mh1 = std::get<memoized_hashes> (h1);
-        assert (mh1.size () == 0U);
-        auto const & vdp1 = std::get<std::vector<vertex_digest_pair>> (h1);
-
-        auto const & mh2 = std::get<memoized_hashes> (h2);
-        assert (mh2.size () == 0U);
-        auto const & vdp2 = std::get<std::vector<vertex_digest_pair>> (h2);
-
+        auto const & vdp1 = std::get<graph_digests> (h1);
+        auto const & vdp2 = std::get<graph_digests> (h2);
         assert (
             std::equal (std::begin (vdp1), std::end (vdp1), std::begin (vdp2), std::end (vdp2)));
     }
@@ -106,34 +108,28 @@ namespace {
     ///
     /// The result hashes shoud be:
     /// | Name | |
-    /// | "a" | Va/Vb/R0<br>
-    ///         Vertex "a" -> vertex "b" -> loop back to the initial (zeroth) vertex. The slash in
+    /// | "a" | Va/Vb/R1<br>
+    ///         Vertex "a" -> vertex "b" -> loop back to the first vertex. The slash in
     ///         this notation can be thought of a directed edge between the two adjacent vertices.
-    /// | "b" | Vb/Va/R0 |
-    /// | "c" | Vc/Va/Vb/R1 |
+    /// | "b" | Vb/Va/R1 |
+    /// | "c" | Vc/Va/Vb/R2 |
+    /// | "d" | Vd/Vc/Va/Vb/R3 |
     void test_looped () {
         std::list<vertex> graph;
         auto & va = graph.emplace_back ("a");
-        auto & vb = graph.emplace_back ("b");
-        auto & vc = graph.emplace_back ("c");
-        auto & vd = graph.emplace_back ("d");
-
+        auto & vb = graph.emplace_back ("b").adjacent (&va); // b -> a;
         va.adjacent (&vb); // a -> b;
-        vb.adjacent (&va); // b -> a;
-        vc.adjacent (&va); // c -> a;
-        vd.adjacent (&vc); // d -> c;
+        auto & vc = graph.emplace_back ("c").adjacent (&va); // c -> a;
+        graph.emplace_back ("d").adjacent (&vc);             // d -> c;
 
-        auto const h1 = hash_vertices (std::begin (graph), std::end (graph));
-        auto const h2 = hash_vertices (std::rbegin (graph), std::rend (graph));
+        auto const forward_result = hash_vertices (std::begin (graph), std::end (graph));
+        assert (std::get<memoized_hashes> (forward_result).size () == 0);
 
-        auto const mh1 = std::move (std::get<memoized_hashes> (h1));
-        assert (mh1.size () == 2);
-        auto const vdp1 = std::move (std::get<std::vector<vertex_digest_pair>> (h1));
+        auto const reverse_result = hash_vertices (std::rbegin (graph), std::rend (graph));
+        assert (std::get<memoized_hashes> (reverse_result).size () == 0);
 
-        auto const mh2 = std::move (std::get<memoized_hashes> (h2));
-        assert (mh2.size () == 2);
-        auto const vdp2 = std::move (std::get<std::vector<vertex_digest_pair>> (h2));
-
+        auto const & vdp1 = std::get<graph_digests> (forward_result);
+        auto const & vdp2 = std::get<graph_digests> (reverse_result);
         assert (
             std::equal (std::begin (vdp1), std::end (vdp1), std::begin (vdp2), std::end (vdp2)));
     }
@@ -151,25 +147,51 @@ namespace {
         auto & vb = graph.emplace_back ("b").adjacent (&va); // b -> a
         auto & vc = graph.emplace_back ("c").adjacent (&vb); // c -> b
         va.adjacent (&vc);                                   // a -> c
-
         auto & vd = graph.emplace_back ("d");
         auto & ve = graph.emplace_back ("e").adjacent (&vd); // e -> d
         auto & vf = graph.emplace_back ("f").adjacent (&ve); // f -> e
         vd.adjacent (&vf);                                   // d -> f
-
-        graph.emplace_back ("g").adjacent ({&vc, &vf});
+        graph.emplace_back ("g").adjacent ({&vc, &vf});      // g -> c; g -> f;
 
         auto const h1 = hash_vertices (std::begin (graph), std::end (graph));
+        assert (std::get<memoized_hashes> (h1).size () == 0U);
+
         auto const h2 = hash_vertices (std::rbegin (graph), std::rend (graph));
+        assert (std::get<memoized_hashes> (h2).size () == 0U);
 
-        auto const mh1 = std::move (std::get<memoized_hashes> (h1));
-        assert (mh1.size () == 1U);
-        auto const vdp1 = std::move (std::get<std::vector<vertex_digest_pair>> (h1));
+        auto const & vdp1 = std::get<graph_digests> (h1);
+        auto const & vdp2 = std::get<graph_digests> (h2);
+        assert (
+            std::equal (std::begin (vdp1), std::end (vdp1), std::begin (vdp2), std::end (vdp2)));
+    }
 
-        auto const mh2 = std::move (std::get<memoized_hashes> (h2));
-        assert (mh2.size () == 1U);
-        auto const vdp2 = std::move (std::get<std::vector<vertex_digest_pair>> (h2));
+    /// digraph G {
+    ///     a -> b;
+    ///     b -> a;
+    ///     c -> d;
+    /// }
+    void two_islands () {
+        std::list<vertex> graph;
+        auto & va = graph.emplace_back ("a");
+        auto & vb = graph.emplace_back ("b").adjacent (&va);
+        va.adjacent (&vb);
+        auto & vc = graph.emplace_back ("c");
+        auto & vd = graph.emplace_back ("d").adjacent (&vc);
 
+        auto const h1 = hash_vertices (std::begin (graph), std::end (graph));
+        auto const & mh1 = std::get<memoized_hashes> (h1);
+        assert (mh1.size () == 2U);
+        assert (mh1.count (&vc) == 1U);
+        assert (mh1.count (&vd) == 1U);
+
+        auto const h2 = hash_vertices (std::rbegin (graph), std::rend (graph));
+        auto const & mh2 = std::get<memoized_hashes> (h2);
+        assert (mh2.size () == 2U);
+        assert (mh2.count (&vc) == 1U);
+        assert (mh2.count (&vd) == 1U);
+
+        auto const & vdp1 = std::get<graph_digests> (h1);
+        auto const & vdp2 = std::get<graph_digests> (h2);
         assert (
             std::equal (std::begin (vdp1), std::end (vdp1), std::begin (vdp2), std::end (vdp2)));
     }
@@ -177,16 +199,13 @@ namespace {
 } // end anonymous namespace
 
 int main () {
-    std::cout << std::boolalpha;
-#if 1
     std::cout << "Simple test:\n";
-    test1 ();
+    simple_test ();
     std::cout << "Bytes hashed so far: " << std::dec << hash::total () << '\n';
 
     std::cout << "Tiny loop test:\n";
     tiny_loop ();
     std::cout << "Bytes hashed so far: " << std::dec << hash::total () << '\n';
-#endif
 
     std::cout << "Test with loop:\n";
     test_looped ();
@@ -194,5 +213,9 @@ int main () {
 
     std::cout << "Two loops:\n";
     two_loops ();
+    std::cout << "Bytes hashed: " << std::dec << hash::total () << '\n';
+
+    std::cout << "Two islands:\n";
+    two_islands ();
     std::cout << "Bytes hashed: " << std::dec << hash::total () << '\n';
 }

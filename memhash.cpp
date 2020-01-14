@@ -21,15 +21,15 @@ namespace {
     std::tuple<size_t, hash::digest> vertex_hash_impl (vertex const * const v,
                                                        memoized_hashes * const table,
                                                        visited * const visited) {
-        static constexpr auto noloop = std::numeric_limits<size_t>::max ();
+        static constexpr auto no_loop = std::numeric_limits<size_t>::max ();
 
         {
             // Have we computed the hash for this function already? If so, did it involve a loop?
             // If we have, and there was no loop, we can return the result immediately.
             auto const pos = table->find (v);
-            if (pos != std::end (*table) && std::get<size_t> (pos->second) == noloop) {
+            if (pos != table->end ()) {
                 trace ("Returning pre-computed hash for '", v->name (), "'\n");
-                return {noloop, std::get<hash::digest> (pos->second)};
+                return {no_loop, pos->second};
             }
         }
 
@@ -39,7 +39,7 @@ namespace {
             // back-reference to the hash and tell the caller that this result should not be
             // memoized.
             auto const back_ref_pos = visited->find (v);
-            if (back_ref_pos != std::end (*visited)) {
+            if (back_ref_pos != visited->end ()) {
                 trace ("Returning back-ref to ", back_ref_pos->second, '\n');
                 h.update_backref (back_ref_pos->second);
                 return {back_ref_pos->second, h.finalize ()};
@@ -53,16 +53,19 @@ namespace {
 
         trace ("Computing hash for '", v->name (), "'\n");
         h.update_vertex (*v);
-        auto loop_index = noloop;
+
+        // Enumerate the adjacent vertices.
+        auto loop_index = no_loop;
         for (auto adj : v->adjacent ()) {
             auto adj_digest = vertex_hash_impl (adj, table, visited);
             loop_index = std::min (std::get<size_t> (adj_digest), loop_index);
             h.update_digest (std::get<hash::digest> (adj_digest));
         }
+
         auto const result = std::make_tuple (loop_index, h.finalize ());
-        if (loop_index > index) {
+        if (loop_index == no_loop) {
             trace ("Recording result for '", v->name (), "'\n");
-            (*table)[v] = result;
+            (*table)[v] = std::get<hash::digest> (result);
         }
         return result;
     }

@@ -6,9 +6,8 @@
 
 #include "hash.hpp"
 
-using memoized_hashes = std::unordered_map<vertex const *, std::tuple<size_t, hash::digest>>;
-
 class vertex;
+using memoized_hashes = std::unordered_map<vertex const *, hash::digest>;
 hash::digest vertex_hash (vertex const * const v, memoized_hashes * const table);
 
 #endif // MEMHASH_HPP

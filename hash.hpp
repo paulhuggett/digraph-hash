@@ -17,7 +17,7 @@ class vertex;
 // its inputs (good for observing the code's behavior). A second implementation is based on fnv1a.
 // Neither makes any pretence of being a decent message-digest function.
 
-//#define STRING_HASH 1
+#define STRING_HASH 1
 #ifdef STRING_HASH
 
 class hash {
