@@ -8,34 +8,7 @@ jobs:
     -   addons:
             apt:
                 packages:
-                - clang-3.8
-                - ninja-build
-                sources:
-                - ubuntu-toolchain-r-test
-        dist: xenial
-        env:
-        - MATRIX_EVAL="CC=clang-3.8 && CXX=clang++-3.8"
-        - CMAKE_BUILD_TYPE=Debug
-        os: linux
-    -   addons:
-            apt:
-                packages:
-                - clang-3.8
-                - ninja-build
-                sources:
-                - ubuntu-toolchain-r-test
-        dist: xenial
-        env:
-        - MATRIX_EVAL="CC=clang-3.8 && CXX=clang++-3.8"
-        - CMAKE_BUILD_TYPE=Release
-        os: linux
-
-
-    -   addons:
-            apt:
-                packages:
                 - clang-9
-                - ninja-build
                 sources:
                 - ubuntu-toolchain-r-test
                 -   key_url: https://apt.llvm.org/llvm-snapshot.gpg.key
@@ -50,7 +23,6 @@ jobs:
             apt:
                 packages:
                 - clang-9
-                - ninja-build
                 sources:
                 - ubuntu-toolchain-r-test
                 -   key_url: https://apt.llvm.org/llvm-snapshot.gpg.key
@@ -67,7 +39,6 @@ jobs:
             apt:
                 packages:
                 - g++-9
-                - ninja-build
                 sources:
                 - ubuntu-toolchain-r-test
         dist: xenial
@@ -79,38 +50,11 @@ jobs:
             apt:
                 packages:
                 - g++-9
-                - ninja-build
                 sources:
                 - ubuntu-toolchain-r-test
         dist: xenial
         env:
         - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
-        - CMAKE_BUILD_TYPE=Release
-        os: linux
-
-
-    -   addons:
-            apt:
-                packages:
-                - g++-5
-                - ninja-build
-                sources:
-                - ubuntu-toolchain-r-test
-        dist: xenial
-        env:
-        - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
-        - CMAKE_BUILD_TYPE=Debug
-        os: linux
-    -   addons:
-            apt:
-                packages:
-                - g++-5
-                - ninja-build
-                sources:
-                - ubuntu-toolchain-r-test
-        dist: xenial
-        env:
-        - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
         - CMAKE_BUILD_TYPE=Release
         os: linux
 

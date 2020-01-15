@@ -11,22 +11,27 @@ function (configure_target target)
         CXX_EXTENSIONS No
     )
 
-    # Enable more warnings.
+    # Tweak options for each compiler.
     if (MSVC)
+        # Enable more warnings.
         target_compile_options (${target} PRIVATE /W4)
     elseif (CMAKE_COMPILER_IS_GNUCXX)
+        # Enable more warnings.
         target_compile_options (${target} PRIVATE
             -Wall
             -Wextra
             -pedantic
         )
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+        # Enable more warnings and request libc++
         target_compile_options (${target} PRIVATE
             -Weverything
             -Wno-c++98-compat
             -Wno-c++98-compat-pedantic
             -Wno-padded
+            -stdlib=libc++
         )
+
     endif ()
 
 endfunction()
