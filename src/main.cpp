@@ -22,10 +22,10 @@ int main () {
     ///     c -> d;
     /// }
     std::list<vertex> graph;
-    auto & va = graph.emplace_back ("a");
-    auto & vb = graph.emplace_back ("b").adjacent (&va);
+    vertex & va = graph.emplace_back ("a");
+    vertex const & vb = graph.emplace_back ("b").adjacent (&va);
     va.adjacent (&vb);
-    auto & vc = graph.emplace_back ("c");
+    vertex const & vc = graph.emplace_back ("c");
     graph.emplace_back ("d").adjacent (&vc);
 
     graph_digests digests;
