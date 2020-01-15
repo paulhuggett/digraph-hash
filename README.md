@@ -11,9 +11,9 @@ Where possible, the results are memoized. This means that we an improve performa
 
 Looking at the graph below:
 
-<div><a href='//sketchviz.com/@paulhuggett/4219c7ba02ac32a9a14c9566bb526ffa'><img src='https://sketchviz.com/@paulhuggett/4219c7ba02ac32a9a14c9566bb526ffa/e057ec6efb6522c45a1c8d404618406f7dac2d62.sketchy.png' style='max-width: 100%;'></a><br/><span style='font-size: 80%;color:#555;'>Hosted on <a href='//sketchviz.com/' style='color:#555;'>Sketchviz</a></span></div>
+<div><a href='//sketchviz.com/@paulhuggett/4219c7ba02ac32a9a14c9566bb526ffa'><img src='https://sketchviz.com/@paulhuggett/4219c7ba02ac32a9a14c9566bb526ffa/e057ec6efb6522c45a1c8d404618406f7dac2d62.sketchy.png' style='max-width: 100%;'></a></div>
 
-If vertex "a" is visited first, we generate its hash a memoize it. Likewise for vertex "b". When generating the hash for "c", we can reusing the cached hashes for the two connected vertices.
+If vertex “a” is visited first, we generate its hash a memoize it. Likewise for vertex “b”. When generating the hash for “c”, we can reusing the cached hashes for the two connected vertices.
 
 | Vertex | Encoding |
 | ------ | -------- |
@@ -25,9 +25,9 @@ If vertex "a" is visited first, we generate its hash a memoize it. Likewise for 
 
 ## A looping example
 
-<div><a href='//sketchviz.com/@paulhuggett/4219c7ba02ac32a9a14c9566bb526ffa'><img src='https://sketchviz.com/@paulhuggett/4219c7ba02ac32a9a14c9566bb526ffa/4ceba724fba0e4d34457a3bfd6b92b7b5bbf2fe6.sketchy.png' style='max-width: 100%;'></a><br/><span style='font-size: 80%;color:#555;'>Hosted on <a href='//sketchviz.com/' style='color:#555;'>Sketchviz</a></span></div>
+<div><a href='//sketchviz.com/@paulhuggett/4219c7ba02ac32a9a14c9566bb526ffa'><img src='https://sketchviz.com/@paulhuggett/4219c7ba02ac32a9a14c9566bb526ffa/4ceba724fba0e4d34457a3bfd6b92b7b5bbf2fe6.sketchy.png' style='max-width: 100%;'></a></div>
 
-Here we have a cycle between vertices "a" and "b". In order to be able to record the looping edge we need to encode a "back-reference" to a previously visited vertex. This is done using the index of that vertex which can change depending where the traversal begins.
+Here we have a cycle between vertices “a” and “b”. In order to be able to record the looping edge we need to encode a "back-reference" to a previously visited vertex. This is done using the index of that vertex which can change depending where the traversal begins.
 
 | Vertex | Encoding    |
 | ------ | ----------- |
