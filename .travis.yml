@@ -1,10 +1,137 @@
 language: cpp
-os:
-- osx
-- linux
-compiler:
-- clang
-- gcc
+
+before_install:
+- eval "${MATRIX_EVAL}"
+
+jobs:
+    include:
+    -   addons:
+            apt:
+                packages:
+                - clang-3.8
+                - ninja-build
+                sources:
+                - ubuntu-toolchain-r-test
+        dist: xenial
+        env:
+        - MATRIX_EVAL="CC=clang-3.8 && CXX=clang++-3.8"
+        - CMAKE_BUILD_TYPE=Debug
+        os: linux
+    -   addons:
+            apt:
+                packages:
+                - clang-3.8
+                - ninja-build
+                sources:
+                - ubuntu-toolchain-r-test
+        dist: xenial
+        env:
+        - MATRIX_EVAL="CC=clang-3.8 && CXX=clang++-3.8"
+        - CMAKE_BUILD_TYPE=Release
+        os: linux
+
+
+    -   addons:
+            apt:
+                packages:
+                - clang-9
+                - ninja-build
+                sources:
+                - ubuntu-toolchain-r-test
+                -   key_url: https://apt.llvm.org/llvm-snapshot.gpg.key
+                    sourceline: deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-9
+                        main
+        dist: xenial
+        env:
+        - MATRIX_EVAL="CC=clang-9 && CXX=clang++-9"
+        - CMAKE_BUILD_TYPE=Debug
+        os: linux
+    -   addons:
+            apt:
+                packages:
+                - clang-9
+                - ninja-build
+                sources:
+                - ubuntu-toolchain-r-test
+                -   key_url: https://apt.llvm.org/llvm-snapshot.gpg.key
+                    sourceline: deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-9
+                        main
+        dist: xenial
+        env:
+        - MATRIX_EVAL="CC=clang-9 && CXX=clang++-9"
+        - CMAKE_BUILD_TYPE=Release
+        os: linux
+
+
+    -   addons:
+            apt:
+                packages:
+                - g++-9
+                - ninja-build
+                sources:
+                - ubuntu-toolchain-r-test
+        dist: xenial
+        env:
+        - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
+        - CMAKE_BUILD_TYPE=Debug
+        os: linux
+    -   addons:
+            apt:
+                packages:
+                - g++-9
+                - ninja-build
+                sources:
+                - ubuntu-toolchain-r-test
+        dist: xenial
+        env:
+        - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
+        - CMAKE_BUILD_TYPE=Release
+        os: linux
+
+
+    -   addons:
+            apt:
+                packages:
+                - g++-5
+                - ninja-build
+                sources:
+                - ubuntu-toolchain-r-test
+        dist: xenial
+        env:
+        - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+        - CMAKE_BUILD_TYPE=Debug
+        os: linux
+    -   addons:
+            apt:
+                packages:
+                - g++-5
+                - ninja-build
+                sources:
+                - ubuntu-toolchain-r-test
+        dist: xenial
+        env:
+        - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+        - CMAKE_BUILD_TYPE=Release
+        os: linux
+
+
+    -   env:
+        - CMAKE_BUILD_TYPE=Debug
+        os: osx
+        osx_image: xcode9.3
+    -   env:
+        - CMAKE_BUILD_TYPE=Release
+        os: osx
+        osx_image: xcode9.3
+
+
+    -   env:
+        - CMAKE_BUILD_TYPE=Debug
+        os: windows
+    -   env:
+        - CMAKE_BUILD_TYPE=Release
+        os: windows
+
 script:
 - mkdir build
 - cd build
