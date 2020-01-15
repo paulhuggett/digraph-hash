@@ -13,7 +13,9 @@ namespace {
 
     using visited = std::unordered_map<vertex const *, size_t>;
 
-    void trace () {}
+    void trace () {
+        // A trace with no arguments is a no-op.
+    }
     template <typename T, typename... Args>
     void trace (T && t, Args &&... args) {
         (void) t;
