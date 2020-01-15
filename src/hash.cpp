@@ -23,7 +23,7 @@ void hash::update_vertex (vertex const & x) noexcept {
     auto const & name = x.name ();
     update (name.c_str (), name.length () + 1U);
 }
-void hash::update_backref (size_t backref) noexcept {
+void hash::update_backref (size_t const backref) noexcept {
     static constexpr auto tag = tags::backref;
     update (&tag, sizeof (tag));
     update (&backref, sizeof (backref));
@@ -34,7 +34,7 @@ void hash::update_digest (digest const & d) noexcept {
     update (&d, sizeof (d));
 }
 
-void hash::update (void const * ptr, size_t size) noexcept {
+void hash::update (void const * ptr, size_t const size) noexcept {
     auto const p = reinterpret_cast<uint8_t const *> (ptr);
     std::for_each (p, p + size, [this] (uint8_t c) {
         state_ = (state_ ^ static_cast<uint64_t> (c)) * fnv1a_64_prime;
@@ -55,7 +55,7 @@ void hash::update_vertex (vertex const & x) {
     bytes_ += add.length ();
     state_ += add;
 }
-void hash::update_backref (size_t backref) {
+void hash::update_backref (size_t const backref) {
     auto const add = prefix () + static_cast<char> (tags::backref) + std::to_string (backref);
     bytes_ += add.length ();
     state_ += add;

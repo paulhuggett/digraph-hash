@@ -56,7 +56,7 @@ namespace {
 
         // Enumerate the adjacent vertices.
         bool looped = false;
-        for (auto adj : v->adjacent ()) {
+        for (vertex const * const adj : v->adjacent ()) {
             auto const adj_digest = vertex_hash_impl (adj, table, visited);
             looped = looped || std::get<bool> (adj_digest);
             h.update_digest (std::get<hash::digest> (adj_digest));
