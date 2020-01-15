@@ -1,5 +1,8 @@
 # Directed Graph Hash
 
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/paulhuggett/digraph-hash.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/paulhuggett/digraph-hash/alerts/)
+[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/paulhuggett/digraph-hash.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/paulhuggett/digraph-hash/context:cpp)
+
 This program demonstrates a method of generating identifying hashes for each vertex in a, potentially cyclic, directed graph.
 
 Where possible, the results are memoized. This means that we an improve performance in cases where a highly connected but acyclic path is encountered. 
