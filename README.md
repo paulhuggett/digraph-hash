@@ -17,9 +17,9 @@ If vertex “a” is visited first, we generate its hash and memoize it. Likewis
 
 | Vertex | Encoding |
 | ------ | -------- |
-| "a"    | Va       |
-| "b"    | Vb       |
-| "c"    | Vc/Va/Vb |
+| “a”    | Va       |
+| “b”    | Vb       |
+| “c”    | Vc/Va/Vb |
 
 (In the notation used here _Vx_ refers to the encoded hash of vertex _x_. A slash can be thought of as an edge between the preceeding and succeeding vertices.)
 
@@ -31,8 +31,8 @@ Here we have a cycle between vertices “a” and “b”. In order to be able t
 
 | Vertex | Encoding    |
 | ------ | ----------- |
-| "a"    | Va/Vb/R0    |
-| "b"    | Vb/Va/R0    |
-| "c"    | Vc/Va/Vb/R1 |
+| “a”    | Va/Vb/R0    |
+| “b”    | Vb/Va/R0    |
+| “c”    | Vc/Va/Vb/R1 |
 
 (Here the nation uses _Rn_ to indicate a back-reference to the vertex at zero-based index _n_.)
