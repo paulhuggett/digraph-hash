@@ -30,7 +30,7 @@ namespace {
         auto const table_pos = table->find (v);
         if (table_pos != table->end ()) {
             trace ("Returning pre-computed hash for '", v->name (), "'\n");
-            return {false, table_pos->second};
+            return std::tuple<bool, hash::digest>{false, table_pos->second};
         }
 
         hash h;
@@ -42,7 +42,7 @@ namespace {
         if (visited_pos != visited->end ()) {
             trace ("Returning back-ref to ", visited_pos->second, '\n');
             h.update_backref (visited_pos->second);
-            return {true, h.finalize ()};
+            return std::tuple<bool, hash::digest>{true, h.finalize ()};
         }
 
         // Record that we have visited this vertex and give it a numerical identifier. This will
