@@ -52,10 +52,10 @@ namespace {
 
     template <typename Iterator>
     auto keys (Iterator first, Iterator last) {
-        using value_type = typename std::iterator_traits<Iterator>::value_type;
-        std::set<typename value_type::first_type> result;
-        std::transform (first, last, std::inserter (result, result.end ()),
-                        [] (value_type const & v) { return v.first; });
+        std::set<vertex const *> result;
+        std::transform (
+            first, last, std::inserter (result, result.end ()),
+            [] (typename std::iterator_traits<Iterator>::value_type const & v) { return v.first; });
         return result;
     }
 
