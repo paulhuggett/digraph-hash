@@ -8,13 +8,13 @@
 
 class vertex {
 public:
-    explicit vertex (std::string name, std::initializer_list<vertex const *> adjacent = {})
-            : name_{std::move (name)}
+    explicit vertex (std::string const & name, std::initializer_list<vertex const *> adjacent = {})
+            : name_{name}
             , adjacent_{adjacent} {}
 
     std::vector<vertex const *> adjacent () const noexcept { return adjacent_; }
 
-    vertex & adjacent (vertex * d) {
+    vertex & adjacent (vertex * const d) {
         adjacent_.insert (std::end (adjacent_), d);
         return *this;
     }
