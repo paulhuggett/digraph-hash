@@ -1,0 +1,10 @@
+#ifndef CONFIG_HPP
+#define CONFIG_HPP
+
+// Enable trace output?
+#cmakedefine TRACE_ENABLED  1
+
+// Enable fnv1-based hashing (rather than simple strings)?
+#cmakedefine FNV1_HASH_ENABLED 1
+
+#endif // CONFIG_HPP

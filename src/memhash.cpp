@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <utility>
 
+#include "config.hpp"
 #include "vertex.hpp"
 
 namespace {
@@ -17,33 +18,32 @@ namespace {
     template <typename T, typename... Args>
     void trace (T && t, Args &&... args) {
         (void) t;
-        // std::cout << t;
+#ifdef TRACE_ENABLED
+        std::cout << t;
+#endif
         trace (std::forward<Args> (args)...);
     }
 
     auto vertex_hash_impl (vertex const * const v, memoized_hashes * const table,
                            visited * const visited) -> std::tuple<bool, hash::digest> {
-        {
-            // Have we computed the hash for this function already? If so, did it involve a loop?
-            // If we have, and there was no loop, we can return the result immediately.
-            auto const pos = table->find (v);
-            if (pos != table->end ()) {
-                trace ("Returning pre-computed hash for '", v->name (), "'\n");
-                return {false, pos->second};
-            }
+        // Have we computed the hash for this function already? If so, did it involve a loop?
+        // If we have, and there was no loop, we can return the result immediately.
+        auto const table_pos = table->find (v);
+        if (table_pos != table->end ()) {
+            trace ("Returning pre-computed hash for '", v->name (), "'\n");
+            return {false, table_pos->second};
         }
 
         hash h;
-        {
-            // Have we previously visited this vertex during this search? If so, add a
-            // back-reference to the hash and tell the caller that this result should not be
-            // memoized.
-            auto const back_ref_pos = visited->find (v);
-            if (back_ref_pos != visited->end ()) {
-                trace ("Returning back-ref to ", back_ref_pos->second, '\n');
-                h.update_backref (back_ref_pos->second);
-                return {true, h.finalize ()};
-            }
+
+        // Have we previously visited this vertex during this search? If so, add a
+        // back-reference to the hash and tell the caller that this result should not be
+        // memoized.
+        auto const visited_pos = visited->find (v);
+        if (visited_pos != visited->end ()) {
+            trace ("Returning back-ref to ", visited_pos->second, '\n');
+            h.update_backref (visited_pos->second);
+            return {true, h.finalize ()};
         }
 
         // Record that we have visited this vertex and give it a numerical identifier. This will

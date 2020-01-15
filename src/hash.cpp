@@ -3,33 +3,19 @@
 #include <algorithm>
 #include "vertex.hpp"
 
+namespace {
+
+    enum class tags : char {
+        backref = 'R',
+        digest = 'D',
+        vertex = 'V',
+    };
+
+} // end anonymous namespace
+
 size_t hash::bytes_ = 0;
 
-#ifdef STRING_HASH
-
-using namespace std::string_literals;
-
-std::string hash::prefix () const {
-    return (state_.length () > 0) ? "/"s : ""s;
-}
-
-void hash::update_vertex (vertex const & x) {
-    auto const add = prefix () + static_cast<char> (tags::vertex) + x.name ();
-    bytes_ += add.length ();
-    state_ += add;
-}
-void hash::update_backref (size_t backref) {
-    auto const add = prefix () + static_cast<char> (tags::backref) + std::to_string (backref);
-    bytes_ += add.length ();
-    state_ += add;
-}
-void hash::update_digest (digest const & d) {
-    auto const add = prefix () /*+ static_cast<char> (tags::digest)*/ + d;
-    bytes_ += add.length ();
-    state_ += add;
-}
-
-#else // STRING_HASH
+#ifdef FNV1_HASH_ENABLED
 
 void hash::update_vertex (vertex const & x) noexcept {
     static constexpr auto tag = tags::vertex;
@@ -56,4 +42,28 @@ void hash::update (void const * ptr, size_t size) noexcept {
     bytes_ += size;
 }
 
-#endif // STRING_HASH
+#else // FNV1_HASH_ENABLED
+
+using namespace std::string_literals;
+
+std::string hash::prefix () const {
+    return (state_.length () > 0) ? "/"s : ""s;
+}
+
+void hash::update_vertex (vertex const & x) {
+    auto const add = prefix () + static_cast<char> (tags::vertex) + x.name ();
+    bytes_ += add.length ();
+    state_ += add;
+}
+void hash::update_backref (size_t backref) {
+    auto const add = prefix () + static_cast<char> (tags::backref) + std::to_string (backref);
+    bytes_ += add.length ();
+    state_ += add;
+}
+void hash::update_digest (digest const & d) {
+    auto const add = prefix () /*+ static_cast<char> (tags::digest)*/ + d;
+    bytes_ += add.length ();
+    state_ += add;
+}
+
+#endif // FNV1_HASH_ENABLED

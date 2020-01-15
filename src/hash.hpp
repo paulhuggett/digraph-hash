@@ -5,39 +5,16 @@
 #include <cstdint>
 #include <string>
 
-enum class tags : char {
-    backref = 'R',
-    digest = 'D',
-    vertex = 'V',
-};
+#include "config.hpp"
 
 class vertex;
 
 // There is a choice of two hash functions: one that simply accumulates a string representation of
 // its inputs (good for observing the code's behavior). A second implementation is based on fnv1a.
-// Neither makes any pretence of being a decent message-digest function.
+// Neither makes any pretence of being a decent message-digest function. Choose which of the two to
+// enable using the cmake FNV1_HASH_ENABLED option.
 
-#define STRING_HASH 1
-#ifdef STRING_HASH
-
-class hash {
-public:
-    using digest = std::string;
-    digest finalize () const noexcept { return state_; }
-
-    void update_vertex (vertex const & x);
-    void update_backref (size_t backref);
-    void update_digest (digest const & d);
-
-    static size_t total () noexcept { return bytes_; }
-
-private:
-    static size_t bytes_;
-    std::string state_;
-    std::string prefix () const;
-};
-
-#else  // STRING_HASH
+#ifdef FNV1_HASH_ENABLED
 
 class hash {
 public:
@@ -59,6 +36,26 @@ private:
 
     void update (void const * ptr, size_t size) noexcept;
 };
-#endif // STRING_HASH
+
+#else // FNV1_HASH_ENABLED
+
+class hash {
+public:
+    using digest = std::string;
+    digest finalize () const noexcept { return state_; }
+
+    void update_vertex (vertex const & x);
+    void update_backref (size_t backref);
+    void update_digest (digest const & d);
+
+    static size_t total () noexcept { return bytes_; }
+
+private:
+    static size_t bytes_;
+    std::string state_;
+    std::string prefix () const;
+};
+
+#endif // FNV1_HASH_ENABLED
 
 #endif // HASH_HPP

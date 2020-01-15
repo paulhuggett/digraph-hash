@@ -1,11 +1,20 @@
+configure_file (
+    config.hpp.in
+    "${CMAKE_CURRENT_BINARY_DIR}/config.hpp"
+    ESCAPE_QUOTES
+)
+
 add_executable (digraph-hash
-    main.cpp
+    "${CMAKE_CURRENT_BINARY_DIR}/config.hpp"
     hash.cpp
     hash.hpp
+    main.cpp
     memhash.cpp
     memhash.hpp
     vertex.hpp
 )
+
+target_include_directories (digraph-hash PUBLIC "${CMAKE_CURRENT_BINARY_DIR}")
 
 set_target_properties (digraph-hash PROPERTIES
   CXX_STANDARD 17
