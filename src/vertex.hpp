@@ -12,7 +12,7 @@ public:
             : name_{name}
             , adjacent_{adjacent} {}
 
-    std::vector<vertex const *> adjacent () const noexcept { return adjacent_; }
+    std::vector<vertex const *> const & adjacent () const noexcept { return adjacent_; }
 
     vertex & adjacent (vertex * const d) {
         adjacent_.insert (std::end (adjacent_), d);
