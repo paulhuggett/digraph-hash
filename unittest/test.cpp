@@ -69,9 +69,9 @@ namespace {
 //     }
 TEST (DigraphHash, Simple) {
     std::list<vertex> graph;
-    auto & va = graph.emplace_back ("a");
-    auto & vb = graph.emplace_back ("b");
-    auto const & vc = graph.emplace_back ("c").adjacent ({&va, &vb}); // c -> a; c -> b;
+    vertex const & va = graph.emplace_back ("a");
+    vertex const & vb = graph.emplace_back ("b");
+    vertex const & vc = graph.emplace_back ("c").adjacent ({&va, &vb}); // c -> a; c -> b;
 
     auto const expected_cache = UnorderedElementsAre (&va, &vb, &vc);
 
@@ -95,8 +95,8 @@ TEST (DigraphHash, Simple) {
 /// }
 TEST (DigraphHash, TinyLoop) {
     std::list<vertex> graph;
-    auto & va = graph.emplace_back ("a");
-    auto & vb = graph.emplace_back ("b").adjacent (&va); // b -> a;
+    vertex & va = graph.emplace_back ("a");
+    vertex const & vb = graph.emplace_back ("b").adjacent (&va); // b -> a;
     va.adjacent (&vb);                                   // a -> b;
 
     // Forward
@@ -119,10 +119,10 @@ TEST (DigraphHash, TinyLoop) {
 /// }
 TEST (DigraphHash, Loop2) {
     std::list<vertex> graph;
-    auto & va = graph.emplace_back ("a");
-    auto & vb = graph.emplace_back ("b").adjacent (&va); // b -> a;
+    vertex & va = graph.emplace_back ("a");
+    vertex const & vb = graph.emplace_back ("b").adjacent (&va); // b -> a;
     va.adjacent (&vb);                                   // a -> b;
-    auto & vc = graph.emplace_back ("c").adjacent (&va); // c -> a;
+    vertex const & vc = graph.emplace_back ("c").adjacent (&va); // c -> a;
     graph.emplace_back ("d").adjacent (&vc);             // d -> c;
 
     // Forward
@@ -147,13 +147,13 @@ TEST (DigraphHash, Loop2) {
 /// }
 TEST (DigraphHash, TwoLoops) {
     std::list<vertex> graph;
-    auto & va = graph.emplace_back ("a");
-    auto & vb = graph.emplace_back ("b").adjacent (&va); // b -> a
-    auto & vc = graph.emplace_back ("c").adjacent (&vb); // c -> b
+    vertex & va = graph.emplace_back ("a");
+    vertex const & vb = graph.emplace_back ("b").adjacent (&va); // b -> a
+    vertex const & vc = graph.emplace_back ("c").adjacent (&vb); // c -> b
     va.adjacent (&vc);                                   // a -> c
-    auto & vd = graph.emplace_back ("d");
-    auto & ve = graph.emplace_back ("e").adjacent (&vd); // e -> d
-    auto & vf = graph.emplace_back ("f").adjacent (&ve); // f -> e
+    vertex & vd = graph.emplace_back ("d");
+    vertex const & ve = graph.emplace_back ("e").adjacent (&vd); // e -> d
+    vertex const & vf = graph.emplace_back ("f").adjacent (&ve); // f -> e
     vd.adjacent (&vf);                                   // d -> f
     graph.emplace_back ("g").adjacent ({&vc, &vf});      // g -> c; g -> f;
 
@@ -178,11 +178,11 @@ TEST (DigraphHash, TwoLoops) {
 /// }
 TEST (DigraphHash, TwoIslands) {
     std::list<vertex> graph;
-    auto & va = graph.emplace_back ("a");
-    auto & vb = graph.emplace_back ("b").adjacent (&va);
+    vertex & va = graph.emplace_back ("a");
+    vertex const & vb = graph.emplace_back ("b").adjacent (&va);
     va.adjacent (&vb);
-    auto & vc = graph.emplace_back ("c");
-    auto & vd = graph.emplace_back ("d").adjacent (&vc);
+    vertex const & vc = graph.emplace_back ("c");
+    vertex const & vd = graph.emplace_back ("d").adjacent (&vc);
 
     auto const expected_cache = UnorderedElementsAre (&vc, &vd);
 
