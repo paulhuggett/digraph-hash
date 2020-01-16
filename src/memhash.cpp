@@ -1,10 +1,13 @@
 #include "memhash.hpp"
 
 #include <algorithm>
-#include <iostream>
 #include <limits>
 #include <unordered_map>
 #include <utility>
+
+#ifdef TRACE_ENABLED
+#    include <iostream>
+#endif
 
 #include "config.hpp"
 #include "vertex.hpp"
@@ -56,11 +59,12 @@ namespace {
 
         // Enumerate the adjacent vertices.
         bool looped = false;
-        for (vertex const * const adj : v->adjacent ()) {
+        for (vertex const * const adj : v->out_edges ()) {
             auto const adj_digest = vertex_hash_impl (adj, table, visited);
             looped = looped || std::get<bool> (adj_digest);
             h.update_digest (std::get<hash::digest> (adj_digest));
         }
+        h.update_end ();
 
         auto const result = std::make_tuple (looped, h.finalize ());
         if (!looped) {

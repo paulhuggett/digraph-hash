@@ -25,6 +25,7 @@ public:
     void update_vertex (vertex const & x) noexcept;
     void update_backref (size_t backref) noexcept;
     void update_digest (digest const & d) noexcept;
+    void update_end () noexcept;
 
     static size_t total () noexcept { return bytes_; }
 
@@ -47,6 +48,7 @@ public:
     void update_vertex (vertex const & x);
     void update_backref (size_t backref);
     void update_digest (digest const & d);
+    void update_end ();
 
     static size_t total () noexcept { return bytes_; }
 

@@ -32,6 +32,17 @@ $ cmake --build build
 
 ## Examples
 
+### Notation
+
+The table below describes the notation used for the result digests shown in the examples in this section.
+
+| Name    | Description |
+| ------- | ----------- |
+| V_x_    | Entry for vertex _x_ |
+| _x_/_y_ | A directed edge from vertex _x_ to vertex _y_ |
+| R_n_    | A “back reference” to the _n_th vertex record in the encoding |
+| E       | Indicates that all of the edges from a vertex have been encoded |
+
 ### A Simple Example
 
 Looking at the graph below:
@@ -40,13 +51,11 @@ Looking at the graph below:
 
 If vertex “a” is visited first, we generate its hash and memoize it. Likewise for vertex “b”. When generating the hash for “c”, we can reuse the cached results for the two connected vertices.
 
-| Vertex | Encoding   | Cached? |
-| ------ | ---------- | ------- |
-| “a”    | `Va`       | Yes     |
-| “b”    | `Vb`       | Yes     |
-| “c”    | `Vc/Va/Vb` | Yes     |
-
-(In the notation used here _Vx_ refers to the encoded hash of vertex _x_. A slash can be thought of as an edge between the preceeding and succeeding vertices.)
+| Vertex | Encoding      | Cached? |
+| ------ | ------------- | ------- |
+| “a”    | `VaE`         | Yes     |
+| “b”    | `VbE`         | Yes     |
+| “c”    | `Vc/VaE/VbEE` | Yes     |
 
 ### A Looping Example
 
@@ -54,13 +63,11 @@ If vertex “a” is visited first, we generate its hash and memoize it. Likewis
 
 Here we have a cycle between vertices “a” and “b”. In order to be able to record the looping edge we need to encode a "back-reference" to a previously visited vertex. This is done using the index of that vertex which can change depending where the traversal begins. This means that we cannot memoize the results for any of the vertices in this example.
 
-| Vertex | Encoding      | Cached? |
-| ------ | ------------- | ------- |
-| “a”    | `Va/Vb/R0`    | No      |
-| “b”    | `Vb/Va/R0`    | No      |
-| “c”    | `Vc/Va/Vb/R1` | No      |
-
-(Here the notation uses _Rn_ to indicate a back-reference to the vertex at zero-based index _n_.)
+| Vertex | Encoding         | Cached? |
+| ------ | ---------------- | ------- |
+| “a”    | `Va/Vb/R0EE`     | No      |
+| “b”    | `Vb/Va/R0EE`     | No      |
+| “c”    | `Vc/Va/Vb/R1EEE` | No      |
 
 ### Hybrid Example
 
@@ -68,11 +75,11 @@ Here we have a cycle between vertices “a” and “b”. In order to be able t
 
 This time we combine both examples: from vertex “a” we can reach a cluster of looping nodes ( “b” → “c” → “b” ) as well as an acyclic group ( “a” → “d” and so on).
 
-| Vertex | Encoding               | Cached? |
-| ------ | ---------------------- | ------- |
-| “a”    | `Va/Vb/Vc/R1/Vd/Ve/Vf` | No      |
-| “b”    | `Vb/Vc/R0`             | No      |
-| “c”    | `Vc/Vb/R0`             | No      |
-| “d”    | `Vd/Ve/Vf`             | Yes     |
-| “e”    | `Ve`                   | Yes     |
-| “f”    | `Vf`                   | Yes     |
+| Vertex | Encoding                     | Cached? |
+| ------ | ---------------------------- | ------- |
+| “a”    | `Va/Vb/Vc/R1EE/Vd/VeE/VfEEE` | No      |
+| “b”    | `Vb/Vc/R0EE`                 | No      |
+| “c”    | `Vc/Vb/R0EE`                 | No      |
+| “d”    | `Vd/VeE/VfEE`                | Yes     |
+| “e”    | `VeE`                        | Yes     |
+| “f”    | `VfE`                        | Yes     |

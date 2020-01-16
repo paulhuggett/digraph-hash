@@ -8,6 +8,7 @@ namespace {
     enum class tags : char {
         backref = 'R',
         digest = 'D',
+        end = 'E',
         vertex = 'V',
     };
 
@@ -32,6 +33,11 @@ void hash::update_digest (digest const & d) noexcept {
     static constexpr auto tag = tags::digest;
     update (&tag, sizeof (tag));
     update (&d, sizeof (d));
+}
+
+void hash::update_end () noexcept {
+    static constexpr auto tag = tags::digest;
+    update (&tag, sizeof (tag));
 }
 
 void hash::update (void const * ptr, size_t const size) noexcept {
@@ -65,5 +71,8 @@ void hash::update_digest (digest const & d) {
     bytes_ += add.length ();
     state_ += add;
 }
-
+void hash::update_end () {
+    bytes_ += sizeof (char);
+    state_ += static_cast<char> (tags::end);
+}
 #endif // FNV1_HASH_ENABLED

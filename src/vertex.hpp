@@ -12,13 +12,13 @@ public:
             : name_{name}
             , adjacent_{adjacent} {}
 
-    std::vector<vertex const *> const & adjacent () const noexcept { return adjacent_; }
+    std::vector<vertex const *> const & out_edges () const noexcept { return adjacent_; }
 
-    vertex & adjacent (vertex const * const d) {
+    vertex & add_edge (vertex const * const d) {
         adjacent_.insert (std::end (adjacent_), d);
         return *this;
     }
-    vertex & adjacent (std::initializer_list<vertex const *> d) {
+    vertex & add_edge (std::initializer_list<vertex const *> d) {
         adjacent_.insert (std::end (adjacent_), d);
         return *this;
     }
