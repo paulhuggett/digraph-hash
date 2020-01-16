@@ -38,9 +38,9 @@ The table below describes the notation used for the result digests shown in the 
 
 | Name    | Description |
 | ------- | ----------- |
-| V_x_    | Entry for vertex _x_ |
-| _x_/_y_ | A directed edge from vertex _x_ to vertex _y_ |
-| R_n_    | A “back reference” to the _n_th vertex record in the encoding |
+| V*x*    | Entry for vertex *x* |
+| *x*/*y* | A directed edge from vertex *x* to vertex *y* |
+| R*n*    | A “back reference” to the *n*th vertex record in the encoding |
 | E       | Indicates that all of the edges from a vertex have been encoded |
 
 ### A Simple Example
