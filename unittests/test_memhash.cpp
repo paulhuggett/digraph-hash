@@ -1,15 +1,15 @@
-#include <list>
+#include "memhash.hpp"
 
 #include <algorithm>
-#include <iterator>
 #include <functional>
+#include <iterator>
+#include <list>
 #include <set>
 
 #include <gmock/gmock.h>
 
 #include "config.hpp"
 #include "hash.hpp"
-#include "memhash.hpp"
 #include "vertex.hpp"
 
 using namespace std::string_literals;
