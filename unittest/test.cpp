@@ -264,13 +264,13 @@ TEST (DigraphHash, CyclicAndAcyclicPaths) {
     vertex & va = graph.emplace_back ("a");
     vertex & vb = graph.emplace_back ("b");
     va.add_edge (&vb);
-    vertex & vc = graph.emplace_back ("c").add_edge (&vb);
+    vertex const & vc = graph.emplace_back ("c").add_edge (&vb);
     vb.add_edge (&vc);
     vertex & vd = graph.emplace_back ("d");
     va.add_edge (&vd);
-    vertex & ve = graph.emplace_back ("e");
+    vertex const & ve = graph.emplace_back ("e");
     vd.add_edge (&ve);
-    vertex & vf = graph.emplace_back ("f");
+    vertex const & vf = graph.emplace_back ("f");
     vd.add_edge (&vf);
 
     auto const result = hash_vertices (std::begin (graph), std::end (graph));
