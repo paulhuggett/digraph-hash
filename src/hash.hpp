@@ -43,6 +43,7 @@ private:
 class hash {
 public:
     using digest = std::string;
+
     digest finalize () const noexcept { return state_; }
 
     void update_vertex (vertex const & x);

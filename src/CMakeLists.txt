@@ -45,6 +45,7 @@ add_library (digraph-hash
     memhash.cpp
     memhash.hpp
     vertex.hpp
+    vertex.cpp
 )
 target_include_directories (digraph-hash PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}"

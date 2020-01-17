@@ -8,7 +8,6 @@
 
 This program demonstrates a method of generating identifying hashes for each vertex in a, potentially cyclic, directed graph. Where possible, intermediate results are memoized. This means that we an improve performance in cases where a highly connected but acyclic path is encountered. 
 
-
 ## Building the code
 
 ### Dependencies
@@ -21,13 +20,13 @@ This program demonstrates a method of generating identifying hashes for each ver
 We need to first clone the source code and its git submodules from github. Next, we create a directory for the build. Running cmake with an optional argument to select a specific build system (“generator”) creates the build. This allows us to use the build utility of our choice (Make, Ninja, Xcode, Visual Studio) to build the code.
 
 ~~~bash
-$ git clone --recursive https://github.com/paulhuggett/digraph-hash.git
-$ cd digraph-hash
-$ mkdir build
-$ cd build
-$ cmake .. <optional generator>
-$ cd ..
-$ cmake --build build
+git clone --recursive https://github.com/paulhuggett/digraph-hash.git
+cd digraph-hash
+mkdir build
+cd build
+cmake ..
+cd ..
+cmake --build build
 ~~~
 
 ## Examples
@@ -53,9 +52,9 @@ If vertex “a” is visited first, we generate its hash and memoize it. Likewis
 
 | Vertex | Encoding      | Cached? |
 | ------ | ------------- | ------- |
-| “a”    | VaE           | Yes     |
-| “b”    | VbE           | Yes     |
-| “c”    | Vc/VaE/VbEE   | Yes     |
+| a      | VaE           | Yes     |
+| b      | VbE           | Yes     |
+| c      | Vc/VaE/VbEE   | Yes     |
 
 ### A Looping Example
 
@@ -65,9 +64,9 @@ Here we have a cycle between vertices “a” and “b”. In order to be able t
 
 | Vertex | Encoding         | Cached? |
 | ------ | ---------------- | ------- |
-| “a”    | Va/Vb/R0EE       | No      |
-| “b”    | Vb/Va/R0EE       | No      |
-| “c”    | Vc/Va/Vb/R1EEE   | No      |
+| a      | Va/Vb/R0EE       | No      |
+| b      | Vb/Va/R0EE       | No      |
+| c      | Vc/Va/Vb/R1EEE   | No      |
 
 ### Hybrid Example
 
@@ -77,9 +76,9 @@ This time we combine both examples: from vertex “a” we can reach a cluster o
 
 | Vertex | Encoding                   | Cached? |
 | ------ | -------------------------- | ------- |
-| “a”    | Va/Vb/Vc/R1EE/Vd/VeE/VfEEE | No      |
-| “b”    | Vb/Vc/R0EE                 | No      |
-| “c”    | Vc/Vb/R0EE                 | No      |
-| “d”    | Vd/VeE/VfEE                | Yes     |
-| “e”    | VeE                        | Yes     |
-| “f”    | VfE                        | Yes     |
+| a      | Va/Vb/Vc/R1EE/Vd/VeE/VfEEE | No      |
+| b      | Vb/Vc/R0EE                 | No      |
+| c      | Vc/Vb/R0EE                 | No      |
+| d      | Vd/VeE/VfEE                | Yes     |
+| e      | VeE                        | Yes     |
+| f      | VfE                        | Yes     |

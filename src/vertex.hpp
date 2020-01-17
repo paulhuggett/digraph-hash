@@ -8,21 +8,13 @@
 
 class vertex {
 public:
-    explicit vertex (std::string const & name, std::initializer_list<vertex const *> adjacent = {})
-            : name_{name}
-            , adjacent_{adjacent} {}
+    /// Constructs a new named vertex with zero or more out-going edges.
+    explicit vertex (std::string const & name, std::initializer_list<vertex const *> adjacent = {});
+
+    vertex & add_edge (vertex const * const d);
+    vertex & add_edge (std::initializer_list<vertex const *> d);
 
     std::vector<vertex const *> const & out_edges () const noexcept { return adjacent_; }
-
-    vertex & add_edge (vertex const * const d) {
-        adjacent_.insert (std::end (adjacent_), d);
-        return *this;
-    }
-    vertex & add_edge (std::initializer_list<vertex const *> d) {
-        adjacent_.insert (std::end (adjacent_), d);
-        return *this;
-    }
-
     std::string const & name () const noexcept { return name_; }
 
 private:
