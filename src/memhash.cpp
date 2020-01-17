@@ -39,6 +39,7 @@ namespace {
         }
 
         hash h;
+        auto const num_visited = visited->size ();
 
         // Have we previously visited this vertex during this search? If so, add a
         // back-reference to the hash and tell the caller that this result should not be
@@ -46,13 +47,17 @@ namespace {
         auto const visited_pos = visited->find (v);
         if (visited_pos != visited->end ()) {
             trace ("Returning back-ref to ", visited_pos->second, '\n');
-            h.update_backref (visited_pos->second);
-            return std::tuple<bool, hash::digest>{true, h.finalize ()};
+            assert (num_visited > visited_pos->second);
+            auto const ref = num_visited - visited_pos->second - 1U;
+            h.update_backref (ref);
+            /// If this was a reference to the same node (a self-reference), then we don't need to
+            /// tell the caller that there was a loop.
+            return std::make_tuple (ref > 0U, h.finalize ());
         }
 
         // Record that we have visited this vertex and give it a numerical identifier. This will
         // be used to form its back-reference if we loop back here in future.
-        (*visited)[v] = visited->size ();
+        (*visited)[v] = num_visited;
 
         trace ("Computing hash for '", v->name (), "'\n");
         h.update_vertex (*v);

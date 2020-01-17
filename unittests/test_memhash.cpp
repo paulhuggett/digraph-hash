@@ -102,6 +102,41 @@ TEST (DigraphHash, Simple) {
 // Test behavior with a graph of the form:
 //
 //     digraph G {
+//         a -> b -> b;
+//     }
+TEST (DigraphHash, SelfLoop) {
+    std::list<vertex> graph;
+    vertex & va = graph.emplace_back ("a");
+    vertex & vb = graph.emplace_back ("b");
+    va.add_edge (&vb); // a -> b;
+    vb.add_edge (&vb); // b -> b;
+
+    auto const expected_cache = UnorderedElementsAre (&va, &vb);
+#ifndef FNV1_HASH_ENABLED
+    auto const expected_digests =
+        ElementsAre (std::make_tuple (&va, "Va/Vb/R0EE"s), std::make_tuple (&vb, "Vb/R0E"s));
+#endif
+
+    // Forward
+    auto const forward_result = hash_vertices (std::begin (graph), std::end (graph));
+    EXPECT_THAT (keys (std::get<memoized_hashes> (forward_result)), expected_cache);
+    STRING_HASH_EXPECT_THAT (std::get<graph_digests> (forward_result), expected_digests);
+
+    // Reverse
+    auto const reverse_result = hash_vertices (std::rbegin (graph), std::rend (graph));
+    EXPECT_THAT (keys (std::get<memoized_hashes> (forward_result)), expected_cache);
+    STRING_HASH_EXPECT_THAT (std::get<graph_digests> (reverse_result), expected_digests);
+
+    // Check that digests are the same for the two traversal orders.
+    EXPECT_THAT (std::get<graph_digests> (forward_result),
+                 Eq (std::get<graph_digests> (reverse_result)))
+        << "Output should not be affected by traversal order";
+}
+
+
+// Test behavior with a graph of the form:
+//
+//     digraph G {
 //         a -> b -> a;
 //     }
 TEST (DigraphHash, TinyLoop) {
@@ -112,7 +147,7 @@ TEST (DigraphHash, TinyLoop) {
 
 #ifndef FNV1_HASH_ENABLED
     auto const expected_digests =
-        ElementsAre (std::make_tuple (&va, "Va/Vb/R0EE"s), std::make_tuple (&vb, "Vb/Va/R0EE"s));
+        ElementsAre (std::make_tuple (&va, "Va/Vb/R1EE"s), std::make_tuple (&vb, "Vb/Va/R1EE"s));
 #endif
 
     // Forward
@@ -148,8 +183,8 @@ TEST (DigraphHash, Loop2) {
 
 #ifndef FNV1_HASH_ENABLED
     auto const expected_digests = ElementsAre (
-        std::make_tuple (&va, "Va/Vb/R0EE"s), std::make_tuple (&vb, "Vb/Va/R0EE"s),
-        std::make_tuple (&vc, "Vc/Va/Vb/R1EEE"s), std::make_tuple (&vd, "Vd/Vc/Va/Vb/R2EEEE"s));
+        std::make_tuple (&va, "Va/Vb/R1EE"s), std::make_tuple (&vb, "Vb/Va/R1EE"s),
+        std::make_tuple (&vc, "Vc/Va/Vb/R1EEE"s), std::make_tuple (&vd, "Vd/Vc/Va/Vb/R1EEEE"s));
 #endif
 
     // Forward
@@ -190,10 +225,10 @@ TEST (DigraphHash, TwoLoops) {
 
 #ifndef FNV1_HASH_ENABLED
     auto const expected_digests = ElementsAre (
-        std::make_tuple (&va, "Va/Vc/Vb/R0EEE"s), std::make_tuple (&vb, "Vb/Va/Vc/R0EEE"s),
-        std::make_tuple (&vc, "Vc/Vb/Va/R0EEE"s), std::make_tuple (&vd, "Vd/Vf/Ve/R0EEE"s),
-        std::make_tuple (&ve, "Ve/Vd/Vf/R0EEE"s), std::make_tuple (&vf, "Vf/Ve/Vd/R0EEE"s),
-        std::make_tuple (&vg, "Vg/Vc/Vb/Va/R1EEE/Vf/Ve/Vd/R4EEEE"s));
+        std::make_tuple (&va, "Va/Vc/Vb/R2EEE"s), std::make_tuple (&vb, "Vb/Va/Vc/R2EEE"s),
+        std::make_tuple (&vc, "Vc/Vb/Va/R2EEE"s), std::make_tuple (&vd, "Vd/Vf/Ve/R2EEE"s),
+        std::make_tuple (&ve, "Ve/Vd/Vf/R2EEE"s), std::make_tuple (&vf, "Vf/Ve/Vd/R2EEE"s),
+        std::make_tuple (&vg, "Vg/Vc/Vb/Va/R2EEE/Vf/Ve/Vd/R2EEEE"s));
 #endif
 
     // Forward
@@ -232,7 +267,7 @@ TEST (DigraphHash, TwoIslands) {
     auto const expected_cache = UnorderedElementsAre (&vc, &vd);
 #ifndef FNV1_HASH_ENABLED
     auto const expected_digests =
-        ElementsAre (std::make_tuple (&va, "Va/Vb/R0EE"s), std::make_tuple (&vb, "Vb/Va/R0EE"s),
+        ElementsAre (std::make_tuple (&va, "Va/Vb/R1EE"s), std::make_tuple (&vb, "Vb/Va/R1EE"s),
                      std::make_tuple (&vc, "Vc/VdEE"s), std::make_tuple (&vd, "VdE"s));
 #endif
 
@@ -278,7 +313,7 @@ TEST (DigraphHash, CyclicAndAcyclicPaths) {
     STRING_HASH_EXPECT_THAT (
         std::get<graph_digests> (result),
         ElementsAre (std::make_tuple (&va, "Va/Vb/Vc/R1EE/Vd/VeE/VfEEE"s),
-                     std::make_tuple (&vb, "Vb/Vc/R0EE"s), std::make_tuple (&vc, "Vc/Vb/R0EE"s),
+                     std::make_tuple (&vb, "Vb/Vc/R1EE"s), std::make_tuple (&vc, "Vc/Vb/R1EE"s),
                      std::make_tuple (&vd, "Vd/VeE/VfEE"s), std::make_tuple (&ve, "VeE"s),
                      std::make_tuple (&vf, "VfE"s)));
 }

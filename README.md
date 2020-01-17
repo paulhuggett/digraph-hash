@@ -9,6 +9,19 @@
 
 This program demonstrates a method of generating identifying hashes for each vertex in a, potentially cyclic, directed graph. Where possible, intermediate results are memoized. This means that we an improve performance in cases where a highly connected but acyclic path is encountered. 
 
+## Table of Contents
+
+*   [Directed Graph Hash](#directed-graph-hash)
+    *   [Building the code](#building-the-code)
+        *   [Dependencies](#dependencies)
+        *   [Clone, Configure and Build](#clone-configure-and-build)
+    *   [Notation](#notation)
+    *   [Examples](#examples)
+        *   [A Simple Example](#a-simple-example)
+        *   [A Looping Example](#a-looping-example)
+        *   [A Self\-Loop](#a-self-loop)
+        *   [Hybrid Example](#hybrid-example)
+
 ## Building the code
 
 ### Dependencies
@@ -30,18 +43,18 @@ cd ..
 cmake --build build
 ~~~
 
-## Examples
-
 ### Notation
 
-The table below describes the notation used for the result digests shown in the examples in this section.
+The table below describes the notation used by the string-hash output and for the result digests shown in the examples in this section.
 
 | Name    | Description |
 | ------- | ----------- |
 | V*x*    | Entry for vertex *x* |
 | *x*/*y* | A directed edge from vertex *x* to vertex *y* |
-| R*n*    | A “back reference” to the *n*th vertex record in the encoding |
+| R*n*    | A “back reference” to the *n*th preceeding vertex record in the encoding. For example, a self-loop `a → a;` would be encoded as “Va/R0E”; a loop between two adjacent vertices `a -> b -> a;` becomes “Va/Vb/R1EE” |
 | E       | Indicates that all of the edges from a vertex have been encoded. This is necessary to enable the hash to distinguish: `a → b → c;` (“Va/Vb/VcEE”) and `a → b; a → c;` (“Va/VbE/VcEE”) |
+
+## Examples
 
 ### A Simple Example
 
@@ -65,9 +78,19 @@ Here we have a cycle between vertices “a” and “b”. In order to be able t
 
 | Vertex | Encoding         | Cached? |
 | ------ | ---------------- | ------- |
-| a      | Va/Vb/R0EE       | No      |
-| b      | Vb/Va/R0EE       | No      |
+| a      | Va/Vb/R1EE       | No      |
+| b      | Vb/Va/R1EE       | No      |
 | c      | Vc/Va/Vb/R1EEE   | No      |
+
+### A Self-Loop
+
+[![Self-Loop](https://sketchviz.com/@paulhuggett/9729072eeb157bba5a3fd59bdfcaaa65/9c514e2eac2a20ac26eaca13cd9637035fc13513.sketchy.png)](https:://sketchviz.com/@paulhuggett/9729072eeb157bba5a3fd59bdfcaaa65)
+
+Here a vertex contains an edge back to the same vertex. We can treat this case specially and cache the result because the loop has just a single possible entry-point.
+
+| Vertex | Encoding      | Cached? |
+| ------ | ------------- | ------- |
+| a      | Va/R0E        | Yes     |
 
 ### Hybrid Example
 
