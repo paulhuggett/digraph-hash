@@ -1,6 +1,7 @@
 #include "memhash.hpp"
 
 #include <algorithm>
+#include <cassert>
 #include <limits>
 #include <unordered_map>
 #include <utility>
