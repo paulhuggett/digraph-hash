@@ -26,8 +26,8 @@ This program demonstrates a method of generating identifying hashes for each ver
 
 ### Dependencies
 
--   [CMake 3.10](https://cmake.org/download/) or later
--   A C++17 compiler. The code is tested with Xcode 9.3, GCC 9.2, and Microsoft Visual Studio 2017.
+*   [CMake 3.10](https://cmake.org/download/) or later
+*   A C++17 compiler. The code is tested with Xcode 9.3, GCC 9.2, and Microsoft Visual Studio 2017.
 
 ### Clone, Configure and Build
 
@@ -45,14 +45,14 @@ cmake --build build
 
 ### Notation
 
-The table below describes the notation used by the string-hash output and for the result digests shown in the examples in this section.
+The table below describes the notation used by the string-hash output and for the result digests shown in the examples below.
 
 | Name    | Description |
 | ------- | ----------- |
-| V*x*    | Entry for vertex *x* |
 | *x*/*y* | A directed edge from vertex *x* to vertex *y* |
-| R*n*    | A “back reference” to the *n*th preceeding vertex record in the encoding. For example, a self-loop `a → a;` would be encoded as “Va/R0E”; a loop between two adjacent vertices `a -> b -> a;` becomes “Va/Vb/R1EE” |
 | E       | Indicates that all of the edges from a vertex have been encoded. This is necessary to enable the hash to distinguish: `a → b → c;` (“Va/Vb/VcEE”) and `a → b; a → c;` (“Va/VbE/VcEE”) |
+| R*n*    | A “back reference” to the *n*th preceeding vertex record in the encoding. For example, in an identity-relationship *n* is zero (`a → a;`) so it would be always encoded as “Va/R0E” (enabling the result to be memoized); a loop between two adjacent vertices (`a -> b -> a;`) becomes “Va/Vb/R1EE” |
+| V*x*    | Entry for vertex *x* |
 
 ## Examples
 
