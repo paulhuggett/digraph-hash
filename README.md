@@ -13,8 +13,8 @@ This program demonstrates a method of generating identifying hashes for each ver
 
 ### Dependencies
 
-- [CMake 3.10](https://cmake.org/download/) or later
-- A C++17 compiler. The code is tested with Xcode 9.3, GCC 9.2, and Microsoft Visual Studio 2017.
+-   [CMake 3.10](https://cmake.org/download/) or later
+-   A C++17 compiler. The code is tested with Xcode 9.3, GCC 9.2, and Microsoft Visual Studio 2017.
 
 ### Clone, Configure and Build
 
@@ -41,7 +41,7 @@ The table below describes the notation used for the result digests shown in the 
 | V*x*    | Entry for vertex *x* |
 | *x*/*y* | A directed edge from vertex *x* to vertex *y* |
 | R*n*    | A “back reference” to the *n*th vertex record in the encoding |
-| E       | Indicates that all of the edges from a vertex have been encoded |
+| E       | Indicates that all of the edges from a vertex have been encoded. This is necessary to enable the hash to distinguish: `a → b → c;` (“Va/Vb/VcEE”) and `a → b; a → c;` (“Va/VbE/VcEE”) |
 
 ### A Simple Example
 
@@ -49,25 +49,25 @@ Looking at the graph below:
 
 [![Simple example](https://sketchviz.com/@paulhuggett/4219c7ba02ac32a9a14c9566bb526ffa/e057ec6efb6522c45a1c8d404618406f7dac2d62.sketchy.png)](https://sketchviz.com/@paulhuggett/4219c7ba02ac32a9a14c9566bb526ffa)
 
-If vertex “a” is visited first, we generate its hash and memoize it. Likewise for vertex “b”. When generating the hash for “c”, we can reuse the cached results for the two connected vertices.
+If vertex “a” is visited first, we generate its hash and memoize it. Likewise for vertex “b”. When generating the hash for “c”, we can reuse the cached results for the two connected vertices. Conversely, if we were to visit the vertices in the opposite order (traversing the paths from “c” first), we would have already cached the results for both “a” and “b” when they are themselves visited.
 
 | Vertex | Encoding      | Cached? |
 | ------ | ------------- | ------- |
-| “a”    | `VaE`         | Yes     |
-| “b”    | `VbE`         | Yes     |
-| “c”    | `Vc/VaE/VbEE` | Yes     |
+| “a”    | VaE           | Yes     |
+| “b”    | VbE           | Yes     |
+| “c”    | Vc/VaE/VbEE   | Yes     |
 
 ### A Looping Example
 
 [![Looping example](https://sketchviz.com/@paulhuggett/4219c7ba02ac32a9a14c9566bb526ffa/4ceba724fba0e4d34457a3bfd6b92b7b5bbf2fe6.sketchy.png)](https://sketchviz.com/@paulhuggett/4219c7ba02ac32a9a14c9566bb526ffa)
 
-Here we have a cycle between vertices “a” and “b”. In order to be able to record the looping edge we need to encode a "back-reference" to a previously visited vertex. This is done using the index of that vertex which can change depending where the traversal begins. This means that we cannot memoize the results for any of the vertices in this example.
+Here we have a cycle between vertices “a” and “b”. In order to be able to record the looping edge we need to encode a “back-reference” to a previously visited vertex. This is done using the index of that vertex which can change depending where the traversal begins. This means that we cannot memoize the results for any of the vertices in this example.
 
 | Vertex | Encoding         | Cached? |
 | ------ | ---------------- | ------- |
-| “a”    | `Va/Vb/R0EE`     | No      |
-| “b”    | `Vb/Va/R0EE`     | No      |
-| “c”    | `Vc/Va/Vb/R1EEE` | No      |
+| “a”    | Va/Vb/R0EE       | No      |
+| “b”    | Vb/Va/R0EE       | No      |
+| “c”    | Vc/Va/Vb/R1EEE   | No      |
 
 ### Hybrid Example
 
@@ -75,11 +75,11 @@ Here we have a cycle between vertices “a” and “b”. In order to be able t
 
 This time we combine both examples: from vertex “a” we can reach a cluster of looping nodes ( “b” → “c” → “b” ) as well as an acyclic group ( “a” → “d” and so on).
 
-| Vertex | Encoding                     | Cached? |
-| ------ | ---------------------------- | ------- |
-| “a”    | `Va/Vb/Vc/R1EE/Vd/VeE/VfEEE` | No      |
-| “b”    | `Vb/Vc/R0EE`                 | No      |
-| “c”    | `Vc/Vb/R0EE`                 | No      |
-| “d”    | `Vd/VeE/VfEE`                | Yes     |
-| “e”    | `VeE`                        | Yes     |
-| “f”    | `VfE`                        | Yes     |
+| Vertex | Encoding                   | Cached? |
+| ------ | -------------------------- | ------- |
+| “a”    | Va/Vb/Vc/R1EE/Vd/VeE/VfEEE | No      |
+| “b”    | Vb/Vc/R0EE                 | No      |
+| “c”    | Vc/Vb/R0EE                 | No      |
+| “d”    | Vd/VeE/VfEE                | Yes     |
+| “e”    | VeE                        | Yes     |
+| “f”    | VfE                        | Yes     |
