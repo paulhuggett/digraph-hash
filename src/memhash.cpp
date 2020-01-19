@@ -30,7 +30,7 @@ namespace {
 #else
     struct sink {
         template <typename... Args>
-        sink (Args const &...) {}
+        explicit sink (Args const &...) {}
     };
 #endif // TRACE_ENABLED
 
