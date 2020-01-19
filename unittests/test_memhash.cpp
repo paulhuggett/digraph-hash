@@ -65,7 +65,7 @@ namespace {
 
 } // end anonymous namespace
 
-std::ostream & operator<< (std::ostream & os, vertex const * v) {
+std::ostream & operator<< (std::ostream & os, vertex const * const v) {
     return os << *v;
 }
 
