@@ -80,7 +80,7 @@ Here we have a cycle between vertices “a” and “b”. In order to be able t
 | ------ | ---------------- | ------- |
 | a      | Va/Vb/R1EE       | No      |
 | b      | Vb/Va/R1EE       | No      |
-| c      | Vc/Va/Vb/R1EEE   | No      |
+| c      | Vc/Va/Vb/R1EEE   | Yes     |
 
 ### A Self-Loop
 
@@ -101,7 +101,7 @@ This time we combine both examples: from vertex “a” we can reach a cluster o
 
 | Vertex | Encoding                   | Cached? |
 | ------ | -------------------------- | ------- |
-| a      | Va/Vb/Vc/R1EE/Vd/VeE/VfEEE | No      |
+| a      | Va/Vb/Vc/R1EE/Vd/VeE/VfEEE | Yes     |
 | b      | Vb/Vc/R0EE                 | No      |
 | c      | Vc/Vb/R0EE                 | No      |
 | d      | Vd/VeE/VfEE                | Yes     |

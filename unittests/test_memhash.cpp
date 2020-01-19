@@ -30,7 +30,8 @@ namespace {
 
     /// \tparam Iterator An iterator type which will produce an instance of type vertex.
     template <typename Iterator>
-    std::tuple<memoized_hashes, graph_digests> hash_vertices (Iterator first, Iterator last) {
+    auto hash_vertices (Iterator first, Iterator last)
+        -> std::tuple<memoized_hashes, graph_digests> {
         graph_digests digests;
         memoized_hashes table;
 
@@ -63,6 +64,10 @@ namespace {
     }
 
 } // end anonymous namespace
+
+std::ostream & operator<< (std::ostream & os, vertex const * v) {
+    return os << *v;
+}
 
 // Test behavior with a graph of the form:
 //
@@ -181,6 +186,7 @@ TEST (DigraphHash, Loop2) {
     vertex const & vc = graph.emplace_back ("c").add_edge (&va); // c -> a;
     vertex const & vd = graph.emplace_back ("d").add_edge (&vc); // d -> c;
 
+    auto const expected_cache = UnorderedElementsAre (&vc, &vd);
 #ifndef FNV1_HASH_ENABLED
     auto const expected_digests = ElementsAre (
         std::make_tuple (&va, "Va/Vb/R1EE"s), std::make_tuple (&vb, "Vb/Va/R1EE"s),
@@ -189,14 +195,12 @@ TEST (DigraphHash, Loop2) {
 
     // Forward
     auto const forward_result = hash_vertices (std::begin (graph), std::end (graph));
-    EXPECT_EQ (std::get<memoized_hashes> (forward_result).size (), 0U)
-        << "Expected nothing to be memoized for this graph";
+    EXPECT_THAT (keys (std::get<memoized_hashes> (forward_result)), expected_cache);
     STRING_HASH_EXPECT_THAT (std::get<graph_digests> (forward_result), expected_digests);
 
     // Reverse
     auto const reverse_result = hash_vertices (std::rbegin (graph), std::rend (graph));
-    EXPECT_EQ (std::get<memoized_hashes> (reverse_result).size (), 0U)
-        << "Expected nothing to be memoized for this graph";
+    EXPECT_THAT (keys (std::get<memoized_hashes> (reverse_result)), expected_cache);
     STRING_HASH_EXPECT_THAT (std::get<graph_digests> (reverse_result), expected_digests);
 
     // Check that digests are the same for the two traversal orders.
@@ -223,6 +227,7 @@ TEST (DigraphHash, TwoLoops) {
     vd.add_edge (&vf);                                                  // d -> f
     vertex const & vg = graph.emplace_back ("g").add_edge ({&vc, &vf}); // g -> c; g -> f;
 
+    auto const expected_cache = UnorderedElementsAre (&vg);
 #ifndef FNV1_HASH_ENABLED
     auto const expected_digests = ElementsAre (
         std::make_tuple (&va, "Va/Vc/Vb/R2EEE"s), std::make_tuple (&vb, "Vb/Va/Vc/R2EEE"s),
@@ -233,14 +238,12 @@ TEST (DigraphHash, TwoLoops) {
 
     // Forward
     auto const forward_result = hash_vertices (std::begin (graph), std::end (graph));
-    EXPECT_EQ (std::get<memoized_hashes> (forward_result).size (), 0U)
-        << "Expected nothing to be memoized for this graph";
+    EXPECT_THAT (keys (std::get<memoized_hashes> (forward_result)), expected_cache);
     STRING_HASH_EXPECT_THAT (std::get<graph_digests> (forward_result), expected_digests);
 
     // Reverse
     auto const reverse_result = hash_vertices (std::rbegin (graph), std::rend (graph));
-    EXPECT_EQ (std::get<memoized_hashes> (reverse_result).size (), 0U)
-        << "Expected nothing to be memoized for this graph";
+    EXPECT_THAT (keys (std::get<memoized_hashes> (reverse_result)), expected_cache);
     STRING_HASH_EXPECT_THAT (std::get<graph_digests> (reverse_result), expected_digests);
 
     // Check that digests are the same for the two traversal orders.
@@ -309,7 +312,8 @@ TEST (DigraphHash, CyclicAndAcyclicPaths) {
     vd.add_edge (&vf);
 
     auto const result = hash_vertices (std::begin (graph), std::end (graph));
-    EXPECT_THAT (keys (std::get<memoized_hashes> (result)), UnorderedElementsAre (&vd, &ve, &vf));
+    EXPECT_THAT (keys (std::get<memoized_hashes> (result)),
+                 UnorderedElementsAre (&va, &vd, &ve, &vf));
     STRING_HASH_EXPECT_THAT (
         std::get<graph_digests> (result),
         ElementsAre (std::make_tuple (&va, "Va/Vb/Vc/R1EE/Vd/VeE/VfEEE"s),

@@ -2,6 +2,7 @@
 #define VERTEX_HPP
 
 #include <initializer_list>
+#include <iosfwd>
 #include <string>
 #include <utility>
 #include <vector>
@@ -21,5 +22,7 @@ private:
     std::string name_;
     std::vector<vertex const *> adjacent_;
 };
+
+std::ostream & operator<< (std::ostream & os, vertex const & v);
 
 #endif // VERTEX_HPP
