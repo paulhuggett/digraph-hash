@@ -34,14 +34,13 @@ void hash::update_digest (digest const & d) noexcept {
     update (&tag, sizeof (tag));
     update (&d, sizeof (d));
 }
-
 void hash::update_end () noexcept {
     static constexpr auto tag = tags::digest;
     update (&tag, sizeof (tag));
 }
 
 void hash::update (void const * ptr, size_t const size) noexcept {
-    auto const p = reinterpret_cast<uint8_t const *> (ptr);
+    auto * const p = reinterpret_cast<uint8_t const *> (ptr);
     std::for_each (p, p + size, [this] (uint8_t c) {
         state_ = (state_ ^ static_cast<uint64_t> (c)) * fnv1a_64_prime;
     });
@@ -72,7 +71,9 @@ void hash::update_digest (digest const & d) {
     state_ += add;
 }
 void hash::update_end () {
-    bytes_ += sizeof (char);
-    state_ += static_cast<char> (tags::end);
+    static constexpr auto c = static_cast<char> (tags::end);
+    bytes_ += sizeof (c);
+    state_ += c;
 }
+
 #endif // FNV1_HASH_ENABLED
