@@ -1,8 +1,9 @@
 cmake_minimum_required (VERSION 3.10)
 project (digraph-hash CXX)
 
-option (TRACE_ENABLED "Enable trace output")
+option (COVERAGE_ENABLED "Capture coverage data")
 option (FNV1_HASH_ENABLED "Enable fnv1-based hashing (rather than simple strings)")
+option (TRACE_ENABLED "Enable trace output")
 
 # Tell gtest to link against the "Multi-threaded Debug DLL runtime
 # library" on Windows.

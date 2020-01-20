@@ -15,6 +15,9 @@ function (configure_target target)
     if (MSVC)
         # Enable more warnings.
         target_compile_options (${target} PRIVATE /W4)
+        if (COVERAGE_ENABLED)
+            message (WARNING "COVERAGE_ENABLED is not yet implemented for MSVC")
+        endif (COVERAGE_ENABLED)
     elseif (CMAKE_COMPILER_IS_GNUCXX)
         # Enable more warnings.
         target_compile_options (${target} PRIVATE
@@ -22,6 +25,10 @@ function (configure_target target)
             -Wextra
             -pedantic
         )
+        if (COVERAGE_ENABLED)
+            target_compile_options (${target} PRIVATE -fprofile-arcs -ftest-coverage)
+            target_link_libraries (${target} PUBLIC --coverage)
+        endif (COVERAGE_ENABLED)
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         # Enable more warnings and request libc++
         target_compile_options (${target} PRIVATE
@@ -31,7 +38,11 @@ function (configure_target target)
             -Wno-padded
             -stdlib=libc++
         )
-
+        if (COVERAGE_ENABLED)
+            target_compile_options (${target} PRIVATE -fprofile-instr-generate -fcoverage-mapping)
+            target_compile_options (${target} PRIVATE -fno-inline-functions)
+            target_link_libraries (${target} PUBLIC -fprofile-instr-generate -fcoverage-mapping)
+        endif (COVERAGE_ENABLED)
     endif ()
 
 endfunction()
