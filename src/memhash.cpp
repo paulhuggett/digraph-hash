@@ -64,6 +64,8 @@ namespace {
         // memoized.
         auto const visited_pos = visited->find (v);
         if (visited_pos != visited->end ()) {
+            // Back-references are encoded as as number relative to the index of the current vertex.
+            // Larger values are further back in the encoding.
             assert (num_visited > visited_pos->second);
             h.update_backref (num_visited - visited_pos->second - 1U);
             trace ("Returning back-ref to #", visited_pos->second);
@@ -80,6 +82,9 @@ namespace {
         // Enumerate the adjacent vertices.
         auto loop_point = std::numeric_limits<size_t>::max ();
         for (vertex const * const out : v->out_edges ()) {
+            // Add an properties of the edge from 'v' to 'out' here.
+            //
+            // Encode the out-going vertex.
             auto const adj_digest = vertex_hash_impl (out, table, visited);
             // A out-edge that points back to this same vertex doesn't count as a loop.
             if (out != v) {
@@ -87,6 +92,7 @@ namespace {
             }
             h.update_digest (std::get<1> (adj_digest));
         }
+        // We've encoded the final edge. Record that in the hash.
         h.update_end ();
 
         auto const result = std::make_tuple (loop_point, h.finalize ());

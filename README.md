@@ -75,7 +75,7 @@ If vertex “a” is visited first, we generate its hash and memoize it. Likewis
 
 [![Looping example](https://sketchviz.com/@paulhuggett/4219c7ba02ac32a9a14c9566bb526ffa/4ceba724fba0e4d34457a3bfd6b92b7b5bbf2fe6.sketchy.png)](https://sketchviz.com/@paulhuggett/4219c7ba02ac32a9a14c9566bb526ffa)
 
-Here we have a cycle between vertices “a” and “b”. In order to be able to record the looping edge we need to encode a “back-reference” to a previously visited vertex. This is done using the index of that vertex which can change depending where the traversal begins. This means that we cannot memoize the results for any of the vertices in this example.
+Here we have a cycle between vertices “a” and “b”. In order to be able to record the looping edge we need to encode a “back-reference” to a previously visited vertex. This is done the index of that vertex relative to the current position: R0 encodes an edge that points to itself, R1 references to the preceeding vertex in the encoding, and so on. This means that we can memoize the results for vertices have edges to members of a loop but that aren’t included within the loop.
 
 | Vertex | Encoding         | Cached? |
 | ------ | ---------------- | ------- |
