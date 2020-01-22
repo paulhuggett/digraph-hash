@@ -44,6 +44,8 @@ cd ..
 cmake --build build
 ~~~
 
+## Examples
+
 ### Notation
 
 The table below describes the notation used by the string-hash output and for the result digests shown in the examples below.
@@ -52,10 +54,8 @@ The table below describes the notation used by the string-hash output and for th
 | ------- | ----------- |
 | *x*/*y* | A directed edge from vertex *x* to vertex *y* |
 | E       | Indicates that all of the edges from a vertex have been encoded. This is necessary to enable the hash to distinguish: `a → b → c;` (“Va/Vb/VcEE”) and `a → b; a → c;` (“Va/VbE/VcEE”) |
-| R*n*    | A “back reference” to the *n*th preceeding vertex record in the encoding. For example, in an identity-relationship *n* is zero (`a → a;`) so it would be always encoded as “Va/R0E” (enabling the result to be memoized); a loop between two adjacent vertices (`a -> b -> a;`) becomes “Va/Vb/R1EE” |
+| R*n*    | A “back reference” to the *n*th preceeding vertex record in the encoding. *n* is claculated by counting backwards through the list of previously visited vertices. In an identity-relationship, *n* is zero (`a → a;`) so it would be always encoded as “Va/R0E”; a loop between two adjacent vertices (`a -> b -> a;`) becomes “Va/Vb/R1EE” |
 | V*x*    | Entry for vertex *x* |
-
-## Examples
 
 ### A Simple Example
 
