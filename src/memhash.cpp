@@ -7,50 +7,20 @@
 #include <unordered_map>
 #include <utility>
 
-#ifdef TRACE_ENABLED
-#    include <iostream>
-#endif
-
-#include "config.hpp"
+#include "trace.hpp"
 #include "vertex.hpp"
 
 namespace {
 
-    using visited = std::unordered_map<vertex const *, size_t>;
-
-#ifdef TRACE_ENABLED
-    void trace_impl () {
-        // A trace with no arguments is a no-op.
-    }
-    template <typename T, typename... Args>
-    void trace_impl (T && t, Args &&... args) {
-        std::cout << t;
-        trace_impl (std::forward<Args> (args)...);
-    }
-#else
-    struct sink {
-        template <typename... Args>
-        explicit sink (Args const &...) {}
-    };
-#endif // TRACE_ENABLED
-
-    template <typename... Args>
-    void trace (Args &&... args) {
-#ifdef TRACE_ENABLED
-        trace_impl (std::forward<Args> (args)...);
-        std::cout << '\n';
-#else
-        sink{args...}; // eat all unused arguments!
-#endif // TRACE_ENABLED
-    }
+    using visited = std::unordered_map<vertex const *, std::size_t>;
 
     auto vertex_hash_impl (vertex const * const v, memoized_hashes * const table,
-                           visited * const visited) -> std::tuple<size_t, hash::digest> {
+                           visited * const visited) -> std::tuple<std::size_t, hash::digest> {
         auto const num_visited = visited->size ();
         trace ("Computing hash for ", *v, " (#", num_visited, ')');
 
-        // Have we computed the hash for this function already? If so, did it involve a loop?
-        // If we have, and there was no loop, we can return the result immediately.
+        // Have we computed the hash for this function already? If so, we can return the result
+        // immediately.
         auto const table_pos = table->find (v);
         if (table_pos != table->end ()) {
             trace ("Returning pre-computed hash for ", *v);
@@ -59,9 +29,8 @@ namespace {
 
         hash h;
 
-        // Have we previously visited this vertex during this search? If so, add a
-        // back-reference to the hash and tell the caller that this result should not be
-        // memoized.
+        // Have we previously visited this vertex during this search? If so, add to the hash a
+        // back-reference to that vertex and return its position to the caller.
         auto const visited_pos = visited->find (v);
         if (visited_pos != visited->end ()) {
             // Back-references are encoded as as number relative to the index of the current vertex.
@@ -80,10 +49,10 @@ namespace {
         h.update_vertex (*v);
 
         // Enumerate the adjacent vertices.
-        auto loop_point = std::numeric_limits<size_t>::max ();
+        auto loop_point = std::numeric_limits<std::size_t>::max ();
         for (vertex const * const out : v->out_edges ()) {
-            // Add an properties of the edge from 'v' to 'out' here.
-            //
+            // Add  any properties of the edge from 'v' to 'out' to the hash here.
+
             // Encode the out-going vertex.
             auto const adj_digest = vertex_hash_impl (out, table, visited);
             // A out-edge that points back to this same vertex doesn't count as a loop.

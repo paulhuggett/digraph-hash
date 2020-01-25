@@ -52,9 +52,9 @@ add_library (digraph-hash
     "${CMAKE_CURRENT_BINARY_DIR}/config.hpp"
     hash.cpp
     hash.hpp
-
     memhash.cpp
     memhash.hpp
+    trace.hpp
     vertex.hpp
     vertex.cpp
 )
