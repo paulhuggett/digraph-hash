@@ -44,6 +44,38 @@ cd ..
 cmake --build build
 ~~~
 
+## The Algorithm
+
+~~~
+procedure vertex-hash (vertex v, memoized-hashes table, visited-vertices visited)
+    num-visited ← size-of(visited)
+    if v in table
+        return (num-visited, table[v])
+    hash h
+    if v in visited
+        h ⨁ back_reference(num-visited - visited[v] - 1)
+        return (visited[v], hash-finalize(h))
+
+    visited[v] ← num-visited
+    h ⨁ v
+    loop_point ← MAXIMUM
+    for each out-vertex out of v
+        h ⨁ edge(v, out)
+        (lp, digest) ← vertex_hash (out, table, visited)
+        if out ≠ v
+            loop_point ← min(loop_point, lp)
+        h ⨁ digest
+    h ⨁ end
+    digest ← hash-finalize(h)
+    if loop_point > num_visited
+        table[v] ← digest
+    return (loop_point, digest)
+~~~
+
+### Origins
+
+The earliest version of this algorithm was based on the method used to eliminate duplicate types from [DWARF debugging information](http://dwarfstd.org/doc/DWARF4.pdf) (see DWARF Debugging Information Format Version 4, Appendix E.2). In this scheme, each type is emitted to a separate `.debug_types` object-file section which has an associated “key” calculated by hashing the contents of the type and of all types that are reachable from it.
+
 ## Examples
 
 ### Notation
