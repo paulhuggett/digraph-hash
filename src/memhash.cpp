@@ -33,7 +33,7 @@ namespace {
         // back-reference to that vertex and return its position to the caller.
         auto const visited_pos = visited->find (v);
         if (visited_pos != visited->end ()) {
-            // Back-references are encoded as as number relative to the index of the current vertex.
+            // Back-references are encoded as a number relative to the index of the current vertex.
             // Larger values are further back in the encoding.
             assert (num_visited > visited_pos->second);
             h.update_backref (num_visited - visited_pos->second - 1U);
