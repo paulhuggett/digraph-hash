@@ -12,16 +12,17 @@ This program demonstrates a method of generating identifying hashes for each ver
 
 ## Table of Contents
 
-*   [Directed Graph Hash](#directed-graph-hash)
-    *   [Building the code](#building-the-code)
-        *   [Dependencies](#dependencies)
-        *   [Clone, Configure and Build](#clone-configure-and-build)
-    *   [Notation](#notation)
-    *   [Examples](#examples)
-        *   [A Simple Example](#a-simple-example)
-        *   [A Looping Example](#a-looping-example)
-        *   [A Self\-Loop](#a-self-loop)
-        *   [Hybrid Example](#hybrid-example)
+*   [Building the code](#building-the-code)
+    *    [Dependencies](#dependencies)
+    *    [Clone, Configure and Build](#clone-configure-and-build)
+* [The Algorithm](#the-algorithm)
+    *    [Origins](#origins)
+* [Examples](#examples)
+    *    [Notation](#notation)
+    *    [A Simple Example](#a-simple-example)
+    *    [A Looping Example](#a-looping-example)
+    *    [A Self\-Loop](#a-self-loop)
+    *    [Hybrid Example](#hybrid-example)
 
 ## Building the code
 
@@ -58,23 +59,23 @@ procedure vertex-hash (vertex v, memoized-hashes table, visited-vertices visited
 
     visited[v] ← num-visited
     h ⨁ v
-    loop_point ← MAXIMUM
+    loop-point ← MAXIMUM
     for each out-vertex out of v
         h ⨁ edge(v, out)
-        (lp, digest) ← vertex_hash (out, table, visited)
+        (lp, digest) ← vertex-hash (out, table, visited)
         if out ≠ v
-            loop_point ← min(loop_point, lp)
+            loop-point ← min(loop-point, lp)
         h ⨁ digest
     h ⨁ end
     digest ← hash-finalize(h)
-    if loop_point > num_visited
+    if loop-point > num-visited
         table[v] ← digest
-    return (loop_point, digest)
+    return (loop-point, digest)
 ~~~
 
 ### Origins
 
-The earliest version of this algorithm was based on the method used to eliminate duplicate types from [DWARF debugging information](http://dwarfstd.org/doc/DWARF4.pdf) (see DWARF Debugging Information Format Version 4, Appendix E.2). In this scheme, each type is emitted to a separate `.debug_types` object-file section which has an associated “key” calculated by hashing the contents of the type and of all types that are reachable from it.
+The earliest version of this algorithm was based on the method used to eliminate duplicate types from DWARF debugging information (see [DWARF Debugging Information Format Version 4]((http://dwarfstd.org/doc/DWARF4.pdf)), Appendix E.2). In this scheme, each type is emitted to a separate `.debug_types` object-file section which has an associated “key” calculated by hashing the contents of the type and of all types that are reachable from it.
 
 ## Examples
 
