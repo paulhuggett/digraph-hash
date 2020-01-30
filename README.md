@@ -13,16 +13,16 @@ This program demonstrates a method of generating identifying hashes for each ver
 ## Table of Contents
 
 *   [Building the code](#building-the-code)
-    *    [Dependencies](#dependencies)
-    *    [Clone, Configure and Build](#clone-configure-and-build)
-* [The Algorithm](#the-algorithm)
-    *    [Origins](#origins)
-* [Examples](#examples)
-    *    [Notation](#notation)
-    *    [A Simple Example](#a-simple-example)
-    *    [A Looping Example](#a-looping-example)
-    *    [A Self\-Loop](#a-self-loop)
-    *    [Hybrid Example](#hybrid-example)
+    *   [Dependencies](#dependencies)
+    *   [Clone, Configure and Build](#clone-configure-and-build)
+*   [The Algorithm](#the-algorithm)
+    *   [Origins](#origins)
+*   [Examples](#examples)
+    *   [Notation](#notation)
+    *   [A Simple Example](#a-simple-example)
+    *   [A Looping Example](#a-looping-example)
+    *   [A Self\-Loop](#a-self-loop)
+    *   [Hybrid Example](#hybrid-example)
 
 ## Building the code
 
