@@ -15,4 +15,4 @@ set (INSTALL_GMOCK Off CACHE BOOL "disable gmock install")
 
 add_subdirectory (googletest)
 add_subdirectory (src)
-add_subdirectory (unittests)
+
