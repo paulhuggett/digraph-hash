@@ -30,9 +30,11 @@ namespace {
         hash h;
 
         // Have we previously visited this vertex during this search? If so, add to the hash a
-        // back-reference to that vertex and return its position to the caller.
-        auto const visited_pos = visited->find (v);
-        if (visited_pos != visited->end ()) {
+        // back-reference to that vertex and return its position to the caller. If not, record that
+        // we have visited this vertex and give it a numerical identifier. This will be used to form
+        // its back-reference if we loop back here in future.
+        auto const [visited_pos, inserted] = visited->try_emplace (v, num_visited);
+        if (!inserted) {
             // Back-references are encoded as a number relative to the index of the current vertex.
             // Larger values are further back in the encoding.
             assert (num_visited > visited_pos->second);
@@ -40,10 +42,6 @@ namespace {
             trace ("Returning back-ref to #", visited_pos->second);
             return std::make_tuple (visited_pos->second, h.finalize ());
         }
-
-        // Record that we have visited this vertex and give it a numerical identifier. This will
-        // be used to form its back-reference if we loop back here in future.
-        (*visited)[v] = num_visited;
 
         // Add vertex v (and any properties it has) to the hash.
         h.update_vertex (*v);
