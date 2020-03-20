@@ -48,27 +48,30 @@ cmake --build build
 ## The Algorithm
 
 ~~~
-procedure vertex-hash (vertex v, memoized-hashes table, visited-vertices visited)
-    num-visited ← size-of(visited)
-    if v in table
+function vertex-hash (v is a vertex,
+                      table is an associative array (vertex→digest),
+                      visited is an associative array (vertex→integer))
+    num-visited ← size of associative array "visited"
+    if v in table then
         return (num-visited, table[v])
-    hash h
-    if v in visited
+    h ← new cryptograph hash
+    if v in visited then
         h ⨁ back_reference(num-visited - visited[v] - 1)
         return (visited[v], hash-finalize(h))
 
     visited[v] ← num-visited
     h ⨁ v
     loop-point ← MAXIMUM
-    for each out-vertex out of v
-        h ⨁ edge(v, out)
+    for each out-edge e of vertex v do
+        h ⨁ e
+        out ← target vertex of e
         (lp, digest) ← vertex-hash (out, table, visited)
-        if out ≠ v
+        if out ≠ v then
             loop-point ← min(loop-point, lp)
         h ⨁ digest
     h ⨁ end
     digest ← hash-finalize(h)
-    if loop-point > num-visited
+    if loop-point > num-visited then
         table[v] ← digest
     return (loop-point, digest)
 ~~~
