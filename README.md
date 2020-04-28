@@ -8,7 +8,7 @@
 [![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/paulhuggett/digraph-hash.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/paulhuggett/digraph-hash/context:cpp)
 [![BCH compliance](https://bettercodehub.com/edge/badge/paulhuggett/digraph-hash?branch=master)](https://bettercodehub.com/)
 
-This program demonstrates a method of generating identifying hashes for each vertex in a, potentially cyclic, directed graph. Where possible, intermediate results are memoized. This means that we an improve performance in cases where a highly connected but acyclic path is encountered. 
+This program demonstrates a method of generating identifying hashes for each vertex in a, potentially cyclic, directed graph. Where possible, intermediate results are memoized. This means that we can improve performance in cases where a highly connected but acyclic path is encountered.
 
 ## Table of Contents
 
@@ -33,7 +33,7 @@ This program demonstrates a method of generating identifying hashes for each ver
 
 ### Clone, Configure and Build
 
-We need to first clone the source code and its git submodules from github. Next, we create a directory for the build. Running cmake with an optional argument to select a specific build system (“generator”) creates the build. This allows us to use the build utility of our choice (Make, Ninja, Xcode, Visual Studio) to build the code.
+We need to first clone the source code and its git submodules from github. Next, we create a directory for the build. Running cmake with an optional argument to select a specific build system (“generator”) creates the build. This allows us to use the build system of our choice (Make, Ninja, Xcode, Visual Studio, and so on) to build the code.
 
 ~~~bash
 git clone --recursive https://github.com/paulhuggett/digraph-hash.git
@@ -54,7 +54,7 @@ function vertex-hash (v is a vertex,
     num-visited ← size of associative array "visited"
     if v in table then
         return (num-visited, table[v])
-    h ← new cryptograph hash
+    h ← new cryptographic hash
     if v in visited then
         h ⨁ back_reference(num-visited - visited[v] - 1)
         return (visited[v], hash-finalize(h))
@@ -76,6 +76,16 @@ function vertex-hash (v is a vertex,
     return (loop-point, digest)
 ~~~
 
+The goal of this algorithm is to produce an identifying hash for each vertex in a directed, and potentially cyclic, graph. The hash of each vertex is produced from the attributes of the vertex itself, its out-going edges and its connected vertices. Highly connected graphs can result in having to visit the same vertices repeatedly so, to provide the best performance, whenever possible we would like to memoize the hash of vertices that we visit.
+
+If the input graph is known to be directed-acyclic, then the algorithm is straightfoward since the hash of each vertex can be safely memoized once it has been computed. If an edge from another vertex connects to it then the hash is returned immediately. The possibility of loops in the graph mean that a more sophisticated approach is needed.
+
+Where several vertices may form a loop (directed-cyclic), the sequence in which the linked vertices are visited will depend on the point of entry into the loop. For example:
+
+[![Loop with two entry points](https://sketchviz.com/@paulhuggett/4219c7ba02ac32a9a14c9566bb526ffa/49d199d7c5d87a9f63553ef27b5c938a1be639ed.png)](//sketchviz.com/@paulhuggett/4219c7ba02ac32a9a14c9566bb526ffa)
+
+Traversing the graph starting with vertex “a” will visit the graph in the order `a -> c -> d -> c` before stopping (due to  having arrived back at a previously encountered vertex). On the other hand, a traversal starting with “b” will follow the order `b -> d -> c -> d` before stopping. This has the result that we cannot memoize the hash for either vertex “c” or vertex “d”. Vertices “a” and “b” lie outside of the `c -> d -> c` loop, so it is possible for us to safely memoize these hashes. Note that as a special case, an out-going edge of vertex which loops back to itself (a “self loop”) can be safely encoded as such since there is only a single point-of-entry to the loop.
+
 ### Origins
 
 The earliest version of this algorithm was based on the method used to eliminate duplicate types from DWARF debugging information (see [DWARF Debugging Information Format Version 4]((http://dwarfstd.org/doc/DWARF4.pdf)), Appendix E.2). In this scheme, each type is emitted to a separate `.debug_types` object-file section which has an associated “key” calculated by hashing the contents of the type and of all types that are reachable from it.
@@ -90,7 +100,7 @@ The table below describes the notation used by the string-hash output and for th
 | ------- | ----------- |
 | *x*/*y* | A directed edge from vertex *x* to vertex *y* |
 | E       | Indicates that all of the edges from a vertex have been encoded. This is necessary to enable the hash to distinguish: `a → b → c;` (“Va/Vb/VcEE”) and `a → b; a → c;` (“Va/VbE/VcEE”) |
-| R*n*    | A “back reference” to the *n*th preceeding vertex record in the encoding. *n* is claculated by counting backwards through the list of previously visited vertices. In an identity-relationship, *n* is zero (`a → a;`) so it would be always encoded as “Va/R0E”; a loop between two adjacent vertices (`a -> b -> a;`) becomes “Va/Vb/R1EE” |
+| R*n*    | A “back reference” to the *n*th preceding vertex record in the encoding. *n* is calculated by counting backwards through the list of previously visited vertices. In an identity-relationship, *n* is zero (`a → a;`) so it would be always encoded as “Va/R0E”; a loop between two adjacent vertices (`a → b → a;`) becomes “Va/Vb/R1EE” |
 | V*x*    | Entry for vertex *x* |
 
 ### A Simple Example
@@ -99,7 +109,7 @@ Looking at the graph below:
 
 [![Simple example](https://sketchviz.com/@paulhuggett/4219c7ba02ac32a9a14c9566bb526ffa/e057ec6efb6522c45a1c8d404618406f7dac2d62.sketchy.png)](https://sketchviz.com/@paulhuggett/4219c7ba02ac32a9a14c9566bb526ffa)
 
-If vertex “a” is visited first, we generate its hash and memoize it. Likewise for vertex “b”. When generating the hash for “c”, we can reuse the cached results for the two connected vertices. Conversely, if we were to visit the vertices in the opposite order (traversing the paths from “c” first), we would have already cached the results for both “a” and “b” when they are themselves visited.
+If vertex “a” is visited first, we generate its hash and memoize it; likewise for vertex “b”. When generating the hash for “c”, we can reuse the cached results for the two connected vertices. Conversely, if we were to visit the vertices in the opposite order (traversing the paths from “c” first), we would have already cached the results for both “a” and “b” when they are themselves visited.
 
 | Vertex | Encoding      | Cached? |
 | ------ | ------------- | ------- |
