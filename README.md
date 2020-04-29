@@ -84,7 +84,7 @@ Where several vertices may form a loop (directed-cyclic), the sequence in which 
 
 [![Loop with two entry points](https://sketchviz.com/@paulhuggett/4219c7ba02ac32a9a14c9566bb526ffa/49d199d7c5d87a9f63553ef27b5c938a1be639ed.png)](//sketchviz.com/@paulhuggett/4219c7ba02ac32a9a14c9566bb526ffa)
 
-Traversing the graph starting with vertex “a” will visit the graph in the order `a -> c -> d -> c` before stopping (due to  having arrived back at a previously encountered vertex). On the other hand, a traversal starting with “b” will follow the order `b -> d -> c -> d` before stopping. This has the result that we cannot memoize the hash for either vertex “c” or vertex “d”. Vertices “a” and “b” lie outside of the `c -> d -> c` loop, so it is possible for us to safely memoize these hashes. Note that as a special case, an out-going edge of vertex which loops back to itself (a “self loop”) can be safely encoded as such since there is only a single point-of-entry to the loop.
+Traversing the graph starting with vertex “a” will visit the graph in the order `a → c → d → c` before stopping (due to  having arrived back at a previously encountered vertex). On the other hand, a traversal starting with “b” will follow the order `b → d → c → d` before stopping. This has the result that we cannot memoize the hash for either vertex “c” or vertex “d”. Vertices “a” and “b” lie outside of the `c → d → c` loop, so it is possible for us to safely memoize these hashes. Note that, as a special case, an out-going edge of a vertex which loops back to itself (a “self loop”) can be safely memoized as there is only a single point-of-entry to the loop.
 
 ### Origins
 
