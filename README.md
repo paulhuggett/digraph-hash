@@ -149,8 +149,8 @@ This time we combine both examples: from vertex “a” we can reach a cluster o
 | Vertex | Encoding                   | Cached? |
 | ------ | -------------------------- | ------- |
 | a      | Va/Vb/Vc/R1EE/Vd/VeE/VfEEE | Yes     |
-| b      | Vb/Vc/R0EE                 | No      |
-| c      | Vc/Vb/R0EE                 | No      |
+| b      | Vb/Vc/R1EE                 | No      |
+| c      | Vc/Vb/R1EE                 | No      |
 | d      | Vd/VeE/VfEE                | Yes     |
 | e      | VeE                        | Yes     |
 | f      | VfE                        | Yes     |
