@@ -9,9 +9,10 @@ jobs:
             apt:
                 packages:
                 - g++-9
+                - libstdc++-8-dev
                 sources:
                 - ubuntu-toolchain-r-test
-        dist: xenial
+        dist: bionic
         env:
         - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
         - TRACE_ENABLED=Yes
@@ -22,9 +23,10 @@ jobs:
             apt:
                 packages:
                 - g++-9
+                - libstdc++-8-dev
                 sources:
                 - ubuntu-toolchain-r-test
-        dist: xenial
+        dist: bionic
         env:
         - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
         - CMAKE_BUILD_TYPE=Debug
@@ -33,9 +35,10 @@ jobs:
             apt:
                 packages:
                 - g++-9
+                - libstdc++-8-dev
                 sources:
                 - ubuntu-toolchain-r-test
-        dist: xenial
+        dist: bionic
         env:
         - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9"
         - CMAKE_BUILD_TYPE=Release
