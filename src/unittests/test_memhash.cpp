@@ -449,21 +449,21 @@ TEST (DigraphHash, DoubleLoop) {
     va.add_edge (&vc);
     vc.add_edge (&vb);
     {
+        memoized_hashes ma;
+        hash::digest const hva = vertex_hash (&va, &ma);
+        STRING_HASH_EXPECT_EQ (hva, "Va/Vb/R1E/Vc/Vb/R2EEE");
+        EXPECT_EQ (ma.size (), 0U);
+    }
+    {
         memoized_hashes mb;
-        hash::digest const hvb = vertex_hash (&va, &mb);
-        STRING_HASH_EXPECT_EQ (hvb, "Va/Vb/R1E/Vc/Vb/R2EEE");
+        hash::digest const hvb = vertex_hash (&vb, &mb);
+        STRING_HASH_EXPECT_EQ (hvb, "Vb/Va/R1/Vc/R2EEE");
         EXPECT_EQ (mb.size (), 0U);
     }
     {
         memoized_hashes mc;
-        hash::digest const hvc = vertex_hash (&vb, &mc);
-        STRING_HASH_EXPECT_EQ (hvc, "Vb/Va/R1/Vc/R2EEE");
+        hash::digest const hvc = vertex_hash (&vc, &mc);
+        STRING_HASH_EXPECT_EQ (hvc, "Vc/Vb/Va/R1/R2EEE");
         EXPECT_EQ (mc.size (), 0U);
-    }
-    {
-        memoized_hashes md;
-        hash::digest const hvd = vertex_hash (&vc, &md);
-        STRING_HASH_EXPECT_EQ (hvd, "Vc/Vb/Va/R1/R2EEE");
-        EXPECT_EQ (md.size (), 0U);
     }
 }
