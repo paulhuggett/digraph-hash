@@ -77,5 +77,7 @@ namespace {
 
 hash::digest vertex_hash (vertex const * const v, memoized_hashes * const table) {
     visited visited;
-    return std::get<digest_index> (vertex_hash_impl (v, table, &visited));
+    auto const result = std::get<digest_index> (vertex_hash_impl (v, table, &visited));
+    assert (visited.empty ());
+    return result;
 }
