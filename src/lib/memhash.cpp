@@ -14,6 +14,8 @@ namespace {
 
     using visited = std::unordered_map<vertex const *, std::size_t>;
 
+    enum vhi_result_indices { depth_index, digest_index };
+
     auto vertex_hash_impl (vertex const * const v, memoized_hashes * const table,
                            visited * const visited) -> std::tuple<std::size_t, hash::digest> {
         auto const depth = visited->size ();
@@ -55,9 +57,9 @@ namespace {
             auto const adj_digest = vertex_hash_impl (out, table, visited);
             // A out-edge that points back to this same vertex doesn't count as a loop.
             if (out != v) {
-                loop_point = std::min (loop_point, std::get<std::size_t> (adj_digest));
+                loop_point = std::min (loop_point, std::get<depth_index> (adj_digest));
             }
-            h.update_digest (std::get<hash::digest> (adj_digest));
+            h.update_digest (std::get<digest_index> (adj_digest));
         }
         // We've encoded the final edge. Record that in the hash.
         h.update_end ();
@@ -65,7 +67,7 @@ namespace {
         auto const result = std::make_tuple (loop_point, h.finalize ());
         if (loop_point > depth) {
             trace ("Recording result for ", *v);
-            (*table)[v] = std::get<hash::digest> (result);
+            (*table)[v] = std::get<digest_index> (result);
         }
         visited->erase (v);
         return result;
@@ -75,5 +77,5 @@ namespace {
 
 hash::digest vertex_hash (vertex const * const v, memoized_hashes * const table) {
     visited visited;
-    return std::get<hash::digest> (vertex_hash_impl (v, table, &visited));
+    return std::get<digest_index> (vertex_hash_impl (v, table, &visited));
 }
