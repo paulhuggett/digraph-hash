@@ -20,8 +20,10 @@ using testing::UnorderedElementsAre;
 
 #ifdef FNV1_HASH_ENABLED
 #    define STRING_HASH_EXPECT_THAT(value, matcher)
+#    define STRING_HASH_EXPECT_EQ(val1, val2)
 #else
 #    define STRING_HASH_EXPECT_THAT(value, matcher) EXPECT_THAT (value, matcher)
+#    define STRING_HASH_EXPECT_EQ(val1, val2) EXPECT_EQ (val1, val2)
 #endif // FNV1_HASH_ENABLED
 
 namespace {
@@ -52,9 +54,8 @@ namespace {
     template <typename Iterator>
     auto keys (Iterator first, Iterator last) {
         std::set<vertex const *> result;
-        std::transform (
-            first, last, std::inserter (result, result.end ()),
-            [] (typename std::iterator_traits<Iterator>::value_type const & v) { return v.first; });
+        std::transform (first, last, std::inserter (result, result.end ()),
+                        [] (auto const & v) { return v.first; });
         return result;
     }
 
@@ -320,4 +321,115 @@ TEST (DigraphHash, CyclicAndAcyclicPaths) {
                      std::make_tuple (&vb, "Vb/Vc/R1EE"s), std::make_tuple (&vc, "Vc/Vb/R1EE"s),
                      std::make_tuple (&vd, "Vd/VeE/VfEE"s), std::make_tuple (&ve, "VeE"s),
                      std::make_tuple (&vf, "VfE"s)));
+}
+
+
+// Check that we can encode multiple edges between the same pair of vertices.
+//
+//     digraph G {
+//         a -> b;
+//         a -> b;
+//     }
+TEST (DigraphHash, TwoEdges) {
+    std::list<vertex> graph;
+    vertex & va = graph.emplace_back ("a");
+    vertex & vb = graph.emplace_back ("b");
+    va.add_edge (&vb);
+    va.add_edge (&vb);
+    {
+        memoized_hashes ma;
+        hash::digest const hva = vertex_hash (&va, &ma);
+        STRING_HASH_EXPECT_EQ (hva, "Va/VbE/VbEE");
+        EXPECT_THAT (keys (ma), UnorderedElementsAre (&va, &vb));
+    }
+    {
+        memoized_hashes mb;
+        hash::digest const hvb = vertex_hash (&vb, &mb);
+        STRING_HASH_EXPECT_EQ (hvb, "VbE");
+        EXPECT_THAT (keys (mb), UnorderedElementsAre (&vb));
+    }
+}
+
+//     digraph G {
+//         a -> b -> d;
+//         a -> c -> d;
+//     }
+TEST (DigraphHash, Diamond) {
+    std::list<vertex> graph;
+    vertex & va = graph.emplace_back ("a");
+    vertex & vb = graph.emplace_back ("b");
+    vertex & vc = graph.emplace_back ("c");
+    vertex & vd = graph.emplace_back ("d");
+    va.add_edge (&vb);
+    vb.add_edge (&vd);
+    va.add_edge (&vc);
+    vc.add_edge (&vd);
+
+    {
+        memoized_hashes ma;
+        hash::digest const hva = vertex_hash (&va, &ma);
+        STRING_HASH_EXPECT_EQ (hva, "Va/Vb/VdEE/Vc/VdEEE");
+        EXPECT_THAT (keys (ma), UnorderedElementsAre (&va, &vb, &vc, &vd));
+    }
+    {
+        memoized_hashes mb;
+        hash::digest const hvb = vertex_hash (&vb, &mb);
+        STRING_HASH_EXPECT_EQ (hvb, "Vb/VdEE");
+        EXPECT_THAT (keys (mb), UnorderedElementsAre (&vb, &vd));
+    }
+    {
+        memoized_hashes mc;
+        hash::digest const hvb = vertex_hash (&vc, &mc);
+        STRING_HASH_EXPECT_EQ (hvb, "Vc/VdEE");
+        EXPECT_THAT (keys (mc), UnorderedElementsAre (&vc, &vd));
+    }
+    {
+        memoized_hashes md;
+        hash::digest const hvc = vertex_hash (&vd, &md);
+        STRING_HASH_EXPECT_EQ (hvc, "VdE");
+        EXPECT_THAT (keys (md), UnorderedElementsAre (&vd));
+    }
+}
+
+// Test behaviour with a twice visited loop
+//     digraph G {
+//         a -> b -> c -> b;
+//         a -> d -> b;
+//     }
+TEST (DigraphHash, TwiceVisitedLoop) {
+    std::list<vertex> graph;
+    vertex & va = graph.emplace_back ("a");
+    vertex & vb = graph.emplace_back ("b");
+    vertex & vc = graph.emplace_back ("c");
+    vertex & vd = graph.emplace_back ("d");
+    va.add_edge (&vb);
+    vb.add_edge (&vc);
+    vc.add_edge (&vb);
+    va.add_edge (&vd);
+    vd.add_edge (&vb);
+
+    {
+        memoized_hashes ma;
+        hash::digest const hva = vertex_hash (&va, &ma);
+        STRING_HASH_EXPECT_EQ (hva, "Va/Vb/Vc/R1EE/Vd/Vb/Vc/R1EEEE");
+        EXPECT_THAT (keys (ma), UnorderedElementsAre (&va, &vd));
+    }
+    {
+        memoized_hashes mb;
+        hash::digest const hvb = vertex_hash (&vb, &mb);
+        STRING_HASH_EXPECT_EQ (hvb, "Vb/Vc/R1EE");
+        EXPECT_EQ (mb.size (), 0U);
+    }
+    {
+        memoized_hashes mc;
+        hash::digest const hvc = vertex_hash (&vc, &mc);
+        STRING_HASH_EXPECT_EQ (hvc, "Vc/Vb/R1EE");
+        EXPECT_EQ (mc.size (), 0U);
+    }
+    {
+        memoized_hashes md;
+        hash::digest const hvd = vertex_hash (&vd, &md);
+        STRING_HASH_EXPECT_EQ (hvd, "Vd/Vb/Vc/R1EEE");
+        EXPECT_THAT (keys (md), UnorderedElementsAre (&vd));
+    }
 }
