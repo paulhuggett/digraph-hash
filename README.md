@@ -73,6 +73,7 @@ function vertex-hash (v is a vertex,
     digest ← hash-finalize(h)
     if loop-point > num-visited then
         table[v] ← digest
+    del v from visited
     return (loop-point, digest)
 ~~~
 
