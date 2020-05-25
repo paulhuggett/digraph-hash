@@ -14,31 +14,33 @@ namespace {
 
     using visited = std::unordered_map<vertex const *, std::size_t>;
 
+    enum vhi_result_indices { depth_index, digest_index };
+
     auto vertex_hash_impl (vertex const * const v, memoized_hashes * const table,
                            visited * const visited) -> std::tuple<std::size_t, hash::digest> {
-        auto const num_visited = visited->size ();
-        trace ("Computing hash for ", *v, " (#", num_visited, ')');
+        auto const depth = visited->size ();
+        trace ("Computing hash for ", *v, " (#", depth, ')');
 
         // Have we computed the hash for this function already? If so, we can return the result
         // immediately.
         auto const table_pos = table->find (v);
         if (table_pos != table->end ()) {
             trace ("Returning pre-computed hash for ", *v);
-            return std::make_tuple (num_visited, table_pos->second);
+            return std::make_tuple (depth, table_pos->second);
         }
 
         hash h;
 
-        // Have we previously visited this vertex during this search? If so, add to the hash a
+        // Have we previously visited this vertex on this path? If so, add to the hash a
         // back-reference to that vertex and return its position to the caller. If not, record that
-        // we have visited this vertex and give it a numerical identifier. This will be used to form
-        // its back-reference if we loop back here in future.
-        auto const [visited_pos, inserted] = visited->try_emplace (v, num_visited);
+        // we have visited this vertex and its depth. This will be used to form a back-reference if
+        // we loop back here in future.
+        auto const [visited_pos, inserted] = visited->try_emplace (v, depth);
         if (!inserted) {
-            // Back-references are encoded as a number relative to the index of the current vertex.
+            // Back-references are encoded as a number relative to the depth of the current vertex.
             // Larger values are further back in the encoding.
-            assert (num_visited > visited_pos->second);
-            h.update_backref (num_visited - visited_pos->second - 1U);
+            assert (depth > visited_pos->second);
+            h.update_backref (depth - visited_pos->second - 1U);
             trace ("Returning back-ref to #", visited_pos->second);
             return std::make_tuple (visited_pos->second, h.finalize ());
         }
@@ -55,18 +57,19 @@ namespace {
             auto const adj_digest = vertex_hash_impl (out, table, visited);
             // A out-edge that points back to this same vertex doesn't count as a loop.
             if (out != v) {
-                loop_point = std::min (loop_point, std::get<0> (adj_digest));
+                loop_point = std::min (loop_point, std::get<depth_index> (adj_digest));
             }
-            h.update_digest (std::get<1> (adj_digest));
+            h.update_digest (std::get<digest_index> (adj_digest));
         }
         // We've encoded the final edge. Record that in the hash.
         h.update_end ();
 
         auto const result = std::make_tuple (loop_point, h.finalize ());
-        if (loop_point > num_visited) {
+        if (loop_point > depth) {
             trace ("Recording result for ", *v);
-            (*table)[v] = std::get<1> (result);
+            (*table)[v] = std::get<digest_index> (result);
         }
+        visited->erase (v);
         return result;
     }
 
@@ -74,5 +77,7 @@ namespace {
 
 hash::digest vertex_hash (vertex const * const v, memoized_hashes * const table) {
     visited visited;
-    return std::get<1> (vertex_hash_impl (v, table, &visited));
+    auto const result = std::get<digest_index> (vertex_hash_impl (v, table, &visited));
+    assert (visited.empty ());
+    return result;
 }
