@@ -1,0 +1,4 @@
+digraph self_loop {
+    graph [bgcolor=transparent];
+    a -> b -> b;
+}

@@ -122,7 +122,7 @@ Here we have a cycle between vertices “a” and “b”. In order to be able t
 
 ### A Self-Loop
 
-[![Self-Loop](https://sketchviz.com/@paulhuggett/45b6427f8db91b04a997420124ded8b4/5aeacb40050b50397222e6f97789b34029f59e29.sketchy.png)](https:://sketchviz.com/@paulhuggett/45b6427f8db91b04a997420124ded8b4)
+![Self-Loop example](images/self_loop.svg)
 
 Here a vertex contains an edge back to the same vertex. We can treat this case specially and cache the result because the loop has just a single possible entry-point.
 

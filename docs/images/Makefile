@@ -6,7 +6,8 @@
 IMAGES = \
 	loop.svg \
 	ex1.svg \
-	ex2.svg
+	ex2.svg \
+	self_loop.svg
 
 .PHONY: all
 all: $(IMAGES)
