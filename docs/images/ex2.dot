@@ -1,0 +1,4 @@
+digraph looping_example {
+    graph [bgcolor=transparent];
+    c -> a -> b -> a;
+}
