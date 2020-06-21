@@ -1,4 +1,5 @@
 digraph G {
+    graph [bgcolor=transparent];
     c -> a;
     c -> b;
 }
