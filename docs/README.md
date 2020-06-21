@@ -1,39 +1,15 @@
-This program demonstrates a method of generating identifying hashes for each vertex in a, potentially cyclic, directed graph. Where possible, intermediate results are memoized. This means that we can improve performance in cases where a highly connected but acyclic path is encountered.
+This program demonstrates a method of generating identifying hashes for each vertex in a potentially cyclic directed graph. Where possible, intermediate results are memoized. This means that we can improve performance in cases where a highly connected but acyclic path is encountered.
 
 ## Table of Contents
 
-*   [Building the code](#building-the-code)
-    *   [Dependencies](#dependencies)
-    *   [Clone, Configure and Build](#clone-configure-and-build)
-*   [The Algorithm](#the-algorithm)
-    *   [Origins](#origins)
-*   [Examples](#examples)
-    *   [Notation](#notation)
-    *   [A Simple Example](#a-simple-example)
-    *   [A Looping Example](#a-looping-example)
-    *   [A Self\-Loop](#a-self-loop)
-    *   [Hybrid Example](#hybrid-example)
-
-## Building the code
-
-### Dependencies
-
-*   [CMake 3.10](https://cmake.org/download/) or later
-*   A C++17 compiler. The code is tested with Xcode 9.3, GCC 9.2, and Microsoft Visual Studio 2017.
-
-### Clone, Configure and Build
-
-We need to first clone the source code and its git submodules from github. Next, we create a directory for the build. Running cmake with an optional argument to select a specific build system (“generator”) creates the build. This allows us to use the build system of our choice (Make, Ninja, Xcode, Visual Studio, and so on) to build the code.
-
-~~~bash
-git clone --recursive https://github.com/paulhuggett/digraph-hash.git
-cd digraph-hash
-mkdir build
-cd build
-cmake ..
-cd ..
-cmake --build build
-~~~
+* [The Algorithm](#the-algorithm)
+  * [Origins](#origins)
+* [Examples](#examples)
+  * [Notation](#notation)
+  * [A Simple Example](#a-simple-example)
+  * [A Looping Example](#a-looping-example)
+  * [A Self\-Loop](#a-self-loop)
+  * [Hybrid Example](#hybrid-example)
 
 ## The Algorithm
 
