@@ -1,0 +1,9 @@
+digraph G {
+    rankdir = LR;
+    a -> c;
+    b -> d;
+    { rank = same; a; b; }
+    c -> d;
+    d -> c;
+    { rank = same; c; d; }
+}

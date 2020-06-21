@@ -1,13 +1,3 @@
-# Directed Graph Hash
-
-[![License](https://img.shields.io/github/license/paulhuggett/digraph-hash)](https://img.shields.io/github/license/paulhuggett/digraph-hash)
-[![Build Status](https://travis-ci.com/paulhuggett/digraph-hash.svg?branch=master)](https://travis-ci.com/paulhuggett/digraph-hash)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=paulhuggett_digraph-hash&metric=alert_status)](https://sonarcloud.io/dashboard?id=paulhuggett_digraph-hash)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/a19f09751c9740eb8422617877da1470)](https://www.codacy.com/manual/paulhuggett/digraph-hash?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=paulhuggett/digraph-hash&amp;utm_campaign=Badge_Grade)
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/paulhuggett/digraph-hash.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/paulhuggett/digraph-hash/alerts/)
-[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/paulhuggett/digraph-hash.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/paulhuggett/digraph-hash/context:cpp)
-[![BCH compliance](https://bettercodehub.com/edge/badge/paulhuggett/digraph-hash?branch=master)](https://bettercodehub.com/)
-
 This program demonstrates a method of generating identifying hashes for each vertex in a, potentially cyclic, directed graph. Where possible, intermediate results are memoized. This means that we can improve performance in cases where a highly connected but acyclic path is encountered.
 
 ## Table of Contents
@@ -83,7 +73,7 @@ If the input graph is known to be directed-acyclic, then the algorithm is straig
 
 Where several vertices may form a loop (directed-cyclic), the sequence in which the linked vertices are visited will depend on the point of entry into the loop. For example:
 
-[![Loop with two entry points](https://sketchviz.com/@paulhuggett/4219c7ba02ac32a9a14c9566bb526ffa/49d199d7c5d87a9f63553ef27b5c938a1be639ed.png)](//sketchviz.com/@paulhuggett/4219c7ba02ac32a9a14c9566bb526ffa)
+[![Loop with two entry points](images/loop.svg)
 
 Traversing the graph starting with vertex “a” will visit the graph in the order `a → c → d → c` before stopping (due to  having arrived back at a previously encountered vertex). On the other hand, a traversal starting with “b” will follow the order `b → d → c → d` before stopping. This has the result that we cannot memoize the hash for either vertex “c” or vertex “d”. Vertices “a” and “b” lie outside of the `c → d → c` loop, so it is possible for us to safely memoize these hashes. Note that, as a special case, an out-going edge of a vertex which loops back to itself (a “self loop”) can be safely memoized as there is only a single point-of-entry to the loop.
 
