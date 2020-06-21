@@ -73,7 +73,7 @@ If the input graph is known to be directed-acyclic, then the algorithm is straig
 
 Where several vertices may form a loop (directed-cyclic), the sequence in which the linked vertices are visited will depend on the point of entry into the loop. For example:
 
-[![Loop with two entry points](images/loop.svg)
+![Loop with two entry points](images/loop.svg)
 
 Traversing the graph starting with vertex “a” will visit the graph in the order `a → c → d → c` before stopping (due to  having arrived back at a previously encountered vertex). On the other hand, a traversal starting with “b” will follow the order `b → d → c → d` before stopping. This has the result that we cannot memoize the hash for either vertex “c” or vertex “d”. Vertices “a” and “b” lie outside of the `c → d → c` loop, so it is possible for us to safely memoize these hashes. Note that, as a special case, an out-going edge of a vertex which loops back to itself (a “self loop”) can be safely memoized as there is only a single point-of-entry to the loop.
 
