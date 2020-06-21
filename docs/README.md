@@ -98,7 +98,7 @@ The table below describes the notation used by the string-hash output and for th
 
 Looking at the graph below:
 
-[![Simple example](https://sketchviz.com/@paulhuggett/4219c7ba02ac32a9a14c9566bb526ffa/e057ec6efb6522c45a1c8d404618406f7dac2d62.sketchy.png)](https://sketchviz.com/@paulhuggett/4219c7ba02ac32a9a14c9566bb526ffa)
+![Simple Example](images/ex1.svg)
 
 If vertex “a” is visited first, we generate its hash and memoize it; likewise for vertex “b”. When generating the hash for “c”, we can reuse the cached results for the two connected vertices. Conversely, if we were to visit the vertices in the opposite order (traversing the paths from “c” first), we would have already cached the results for both “a” and “b” when they are themselves visited.
 

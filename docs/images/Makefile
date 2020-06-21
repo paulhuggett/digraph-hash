@@ -3,9 +3,12 @@
 %.svg: %.dot
 	dot -T svg -o $@ $<
 
+IMAGES = loop.svg ex1.svg
+
 .PHONY: all
-all: loop.svg
+all: $(IMAGES)
 .PHONY: clean
 clean:
-	-rm -f loop.svg
+	-rm -f $(IMAGES)
+
 
