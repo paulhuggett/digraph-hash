@@ -133,7 +133,7 @@ Here a vertex contains an edge back to the same vertex. We can treat this case s
 
 ### Hybrid Example
 
-[![Hybrid Example](https://sketchviz.com/@paulhuggett/1b8fba83ebff1ebe66aa96a9fa9d7c2e/7c0fb7ef6465c31f858940b444b2cf6b2f66d748.sketchy.png)](https://sketchviz.com/@paulhuggett/1b8fba83ebff1ebe66aa96a9fa9d7c2e)
+![Hybrid example](images/hybrid.svg)
 
 This time we combine both examples: from vertex “a” we can reach a cluster of looping nodes ( “b” → “c” → “b” ) as well as an acyclic group ( “a” → “d” and so on).
 
